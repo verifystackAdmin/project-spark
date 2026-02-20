@@ -19,7 +19,7 @@ import {
   ArrowUpRight,
   RefreshCw,
 } from "lucide-react";
-import { Footer } from "@/components/layout/Footer";
+import Footer from "@/components/layout/Footer";
 import { cn } from "@/lib/utils";
 
 const sidebarItems = [
