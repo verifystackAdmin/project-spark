@@ -34,7 +34,7 @@ import {
   Linkedin,
   Youtube,
   Facebook,
-  Pinterest,
+  Pin,
   Layers,
   Rocket,
 } from "lucide-react";
@@ -101,7 +101,7 @@ const Index = () => {
 
   const socialLinks = [
     { name: 'LinkedIn', href: 'https://www.linkedin.com/company/verifystack/', icon: Linkedin },
-    { name: 'Pinterest', href: 'https://www.pinterest.com/verifystack/', icon: Pinterest },
+    { name: 'Pinterest', href: 'https://www.pinterest.com/verifystack/', icon: Pin },
     { name: 'YouTube', href: 'https://www.youtube.com/@verifyStack', icon: Youtube },
     { name: 'Facebook', href: 'https://www.facebook.com/profile.php?id=61588407292883', icon: Facebook },
     { name: 'Stack Overflow', href: 'https://stackoverflow.com/users/32369956/verifystack', icon: Layers },
@@ -276,7 +276,7 @@ const Index = () => {
                     {badge.label}
                   </motion.div>
                 ))}
-              </motion.div>
+              </div>
           </div>
         </div>
       </section>
