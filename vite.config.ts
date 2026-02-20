@@ -6,10 +6,22 @@ import { componentTagger } from "lovable-tagger";
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
-    host: "::",
-    port: 8080,
-    hmr: {
-      overlay: false,
+    host: "localhost",
+    port: 5173,
+    proxy: {
+      // Proxy API requests to backend to avoid CORS issues
+      "/api/billing": {
+        target: "https://bgv-billing-service.onrender.com",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ""),
+        logLevel: "debug",
+      },
+      "/api/auth": {
+        target: "https://bgv-auth-service.onrender.com",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ""),
+        logLevel: "debug",
+      },
     },
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
