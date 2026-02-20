@@ -7,6 +7,7 @@ interface Particle {
   vy: number;
   radius: number;
   opacity: number;
+  hue: number;
 }
 
 const AIParticleBackground = () => {
@@ -31,15 +32,15 @@ const AIParticleBackground = () => {
     const w = () => canvas.offsetWidth;
     const h = () => canvas.offsetHeight;
 
-    // Initialize particles
-    const count = Math.min(80, Math.floor((w() * h()) / 12000));
+    const count = Math.min(100, Math.floor((w() * h()) / 10000));
     particlesRef.current = Array.from({ length: count }, () => ({
       x: Math.random() * w(),
       y: Math.random() * h(),
-      vx: (Math.random() - 0.5) * 0.4,
-      vy: (Math.random() - 0.5) * 0.4,
-      radius: Math.random() * 2 + 1,
-      opacity: Math.random() * 0.5 + 0.2,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: (Math.random() - 0.5) * 0.3,
+      radius: Math.random() * 1.5 + 0.5,
+      opacity: Math.random() * 0.4 + 0.1,
+      hue: Math.random() > 0.5 ? 217 : 185,
     }));
 
     const handleMouse = (e: MouseEvent) => {
@@ -59,41 +60,34 @@ const AIParticleBackground = () => {
         if (p.x < 0 || p.x > w()) p.vx *= -1;
         if (p.y < 0 || p.y > h()) p.vy *= -1;
 
-        // Mouse repulsion
         const dx = p.x - mouse.x;
         const dy = p.y - mouse.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 120) {
-          p.vx += dx * 0.001;
-          p.vy += dy * 0.001;
+        if (dist < 150) {
+          p.vx += dx * 0.0008;
+          p.vy += dy * 0.0008;
         }
 
-        // Speed limit
         const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
-        if (speed > 1) {
-          p.vx *= 0.99;
-          p.vy *= 0.99;
-        }
+        if (speed > 0.8) { p.vx *= 0.99; p.vy *= 0.99; }
 
-        // Draw particle
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = `hsla(225, 84%, 55%, ${p.opacity})`;
+        ctx.fillStyle = `hsla(${p.hue}, 91%, 60%, ${p.opacity})`;
         ctx.fill();
       }
 
-      // Draw connections
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
           const dx = particles[i].x - particles[j].x;
           const dy = particles[i].y - particles[j].y;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 150) {
-            const alpha = (1 - dist / 150) * 0.15;
+          if (dist < 120) {
+            const alpha = (1 - dist / 120) * 0.08;
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = `hsla(174, 90%, 42%, ${alpha})`;
+            ctx.strokeStyle = `hsla(185, 100%, 50%, ${alpha})`;
             ctx.lineWidth = 0.5;
             ctx.stroke();
           }
@@ -117,7 +111,7 @@ const AIParticleBackground = () => {
     <canvas
       ref={canvasRef}
       className="absolute inset-0 w-full h-full pointer-events-auto"
-      style={{ opacity: 0.6 }}
+      style={{ opacity: 0.5 }}
     />
   );
 };
