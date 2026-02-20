@@ -1,0 +1,84 @@
+import { motion } from "framer-motion";
+import { Shield, CheckCircle, ArrowRight, Users } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import ScrollReveal from "@/components/ScrollReveal";
+
+const benefits = [
+  "Pre-verify your entire candidate pool at once",
+  "Security guards, housekeeping staff, delivery partners—all verified",
+  "Market yourself as a \"Verified-Only Workforce Provider\"",
+  "Win premium contracts with enterprise credibility",
+];
+
+const AgencyFocus = () => {
+  return (
+    <section className="py-20 bg-secondary/30 relative overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-20 right-[10%] w-72 h-72 bg-primary/5 rounded-full blur-3xl animate-float-slow" />
+      </div>
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="grid lg:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
+          <ScrollReveal direction="scale">
+            <div className="relative bg-card rounded-3xl p-8 border border-border shadow-xl overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-accent to-primary/50" />
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                  <Users className="w-7 h-7 text-primary-foreground" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Agency Dashboard</p>
+                  <p className="font-bold text-foreground">Bulk Verification</p>
+                </div>
+              </div>
+              <div className="space-y-3">
+                {["Security Guard — Verified ✓", "Housekeeping — Verified ✓", "Delivery Partner — Pending...", "Driver — Verified ✓"].map((item, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: 20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                    viewport={{ once: true }}
+                    className="bg-secondary/50 rounded-xl p-3 text-sm font-medium text-foreground"
+                  >
+                    {item}
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </ScrollReveal>
+
+          <ScrollReveal>
+            <div>
+              <span className="inline-block px-4 py-1.5 bg-primary/10 text-primary text-sm font-semibold rounded-full mb-4">
+                For Manpower & Staffing Agencies
+              </span>
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
+                Verify Your Workforce at the Source
+              </h2>
+              <p className="text-muted-foreground mb-6 leading-relaxed">
+                Instead of verifying one worker at a time, VerifyStack enables agencies to pre-verify their entire candidate pool. Agencies using VerifyStack can market themselves as "Verified-Only Workforce Providers", win premium contracts, and build unmatched credibility with enterprise clients.
+              </p>
+              <ul className="space-y-3 mb-8">
+                {benefits.map((benefit, i) => (
+                  <li key={i} className="flex items-start gap-3 text-muted-foreground">
+                    <CheckCircle className="w-5 h-5 text-trust mt-0.5 shrink-0" />
+                    <span>{benefit}</span>
+                  </li>
+                ))}
+              </ul>
+              <Link to="/contact">
+                <Button size="lg" className="group hover-glow">
+                  👉 Become a Verified Agency Partner
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
+            </div>
+          </ScrollReveal>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default AgencyFocus;
