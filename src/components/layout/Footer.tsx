@@ -44,9 +44,11 @@ const Footer = () => {
                 VerifyStack
               </span>
             </Link>
-            <p className="text-background/70 text-sm leading-relaxed mb-6">
-              AI-powered background verification for individuals and businesses. 
-              Verify identity, documents, employment, and more with instant, reliable results.
+            <p className="text-background/70 text-sm leading-relaxed mb-4">
+              VerifyStack democratizes trust—making enterprise-grade background verification accessible to businesses, agencies, housing societies, and everyday individuals.
+            </p>
+            <p className="text-xs text-background/50 font-medium mb-6">
+              Building the Trust Infrastructure for India.
             </p>
             <div className="flex items-center gap-4">
               <a href="#" className="w-10 h-10 rounded-full bg-background/10 flex items-center justify-center hover:bg-primary transition-colors">

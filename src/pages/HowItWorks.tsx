@@ -85,7 +85,7 @@ const HowItWorks = () => {
             Works
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-            Get peace of mind in three simple steps. Our AI-powered verification gives you the truth — fast, secure, and confidential.
+            Enterprise-grade background verification in three simple steps. Whether you're a business, agency, or individual — get verified results fast, secure, and confidential.
           </p>
 
           {/* Trust Badges */}
