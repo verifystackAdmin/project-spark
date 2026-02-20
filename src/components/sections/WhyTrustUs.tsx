@@ -1,45 +1,50 @@
 import { motion } from "framer-motion";
-import { Shield, Lock, CheckCircle, Brain, Fingerprint } from "lucide-react";
+import { Shield, Lock, Brain, Eye, FileText, Server } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
 
-const badges = [
-  { icon: CheckCircle, label: "GDPR Ready" },
-  { icon: Shield, label: "India DPDP Compliant" },
-  { icon: Lock, label: "Secure Infrastructure" },
-  { icon: Brain, label: "AI-Powered Risk Scoring" },
+const features = [
+  { icon: Brain, label: "AI Explainability", description: "Transparent scoring with full reasoning" },
+  { icon: Lock, label: "End-to-End Encryption", description: "AES-256 encryption at rest and in transit" },
+  { icon: Shield, label: "DPDP & GDPR Ready", description: "Compliance-first architecture" },
+  { icon: FileText, label: "Audit Logs", description: "Complete verification audit trail" },
+  { icon: Eye, label: "Real-time Monitoring", description: "Live data source monitoring" },
+  { icon: Server, label: "Secure Infrastructure", description: "SOC 2 compliant cloud hosting" },
 ];
 
 const WhyTrustUs = () => {
   return (
-    <section className="py-20 bg-secondary/30">
-      <div className="container mx-auto px-4">
+    <section className="py-24 relative overflow-hidden">
+      <div className="absolute inset-0 neural-grid opacity-20" />
+      <div className="container mx-auto px-4 relative z-10">
         <ScrollReveal>
-          <div className="text-center mb-12">
-            <span className="inline-block px-4 py-1.5 bg-primary/10 text-primary text-sm font-semibold rounded-full mb-4">
-              Built on Trust
+          <div className="text-center mb-16">
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-trust/10 text-trust text-xs font-semibold rounded-full mb-4 border border-trust/20 uppercase tracking-widest">
+              Security & Compliance
             </span>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
+            <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-6">
               Why Trust VerifyStack?
             </h2>
-            <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
               Trust is broken when verification is slow, manual, and fragmented.
-              VerifyStack brings AI-powered identity verification, real-time data sources, and compliance-first architecture into one platform.
-              Whether you're a hiring manager, an agency owner, or a homeowner—VerifyStack ensures you never trust blindly again.
+              We bring AI-powered verification, real-time data, and compliance-first architecture into one platform.
             </p>
           </div>
         </ScrollReveal>
 
-        <div className="flex flex-wrap items-center justify-center gap-6 max-w-3xl mx-auto">
-          {badges.map((badge, i) => (
-            <ScrollReveal key={i} delay={i * 0.1}>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
+          {features.map((feature, i) => (
+            <ScrollReveal key={i} delay={i * 0.08}>
               <motion.div
-                whileHover={{ scale: 1.08, y: -4 }}
-                className="flex items-center gap-3 bg-card rounded-2xl px-6 py-4 border border-border shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-300 cursor-default"
+                whileHover={{ y: -4 }}
+                className="glass-card-hover rounded-xl p-6 flex items-start gap-4"
               >
-                <div className="w-10 h-10 rounded-xl bg-trust/10 flex items-center justify-center">
-                  <badge.icon className="w-5 h-5 text-trust" />
+                <div className="w-10 h-10 rounded-lg bg-trust/10 flex items-center justify-center shrink-0">
+                  <feature.icon className="w-5 h-5 text-trust" />
                 </div>
-                <span className="font-medium text-foreground">{badge.label}</span>
+                <div>
+                  <p className="font-semibold text-foreground text-sm mb-1">{feature.label}</p>
+                  <p className="text-xs text-muted-foreground">{feature.description}</p>
+                </div>
               </motion.div>
             </ScrollReveal>
           ))}
