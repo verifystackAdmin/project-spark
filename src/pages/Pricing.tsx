@@ -162,7 +162,7 @@ const Pricing = () => {
             </span>
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Choose the plan that fits your needs and get started today.
+            Enterprise-grade verification accessible to everyone. Choose the plan that fits your needs — for individuals, agencies, or businesses.
           </p>
 
           {/* Segment Toggle */}
