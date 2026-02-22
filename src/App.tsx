@@ -48,6 +48,13 @@ import DocumentVerification from "./pages/DocumentVerification";
 import BusinessVerification from "./pages/BusinessVerification";
 import TrustScore from "./pages/TrustScore";
 import Demo from "./pages/Demo";
+import TenantScreening from "./pages/use-cases/TenantScreening";
+import DomesticWorkerVerification from "./pages/use-cases/DomesticWorkerVerification";
+import EmployeeBackgroundCheck from "./pages/use-cases/EmployeeBackgroundCheck";
+import FreelancerVerification from "./pages/use-cases/FreelancerVerification";
+import HousingSocietyScreening from "./pages/use-cases/HousingSocietyScreening";
+import StaffingAgencyVerification from "./pages/use-cases/StaffingAgencyVerification";
+import VendorVerification from "./pages/use-cases/VendorVerification";
 
 const queryClient = new QueryClient();
 
@@ -91,6 +98,13 @@ const App = () => (
             <Route path="/business-verification" element={<BusinessVerification />} />
             <Route path="/trust-score" element={<TrustScore />} />
             <Route path="/demo" element={<Demo />} />
+            <Route path="/use-cases/tenant-screening" element={<TenantScreening />} />
+            <Route path="/use-cases/domestic-worker-verification" element={<DomesticWorkerVerification />} />
+            <Route path="/use-cases/employee-background-check" element={<EmployeeBackgroundCheck />} />
+            <Route path="/use-cases/freelancer-verification" element={<FreelancerVerification />} />
+            <Route path="/use-cases/housing-society-screening" element={<HousingSocietyScreening />} />
+            <Route path="/use-cases/staffing-agency-verification" element={<StaffingAgencyVerification />} />
+            <Route path="/use-cases/vendor-verification" element={<VendorVerification />} />
             {/* Admin Routes */}
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>

@@ -26,31 +26,37 @@ const individualUseCases = [
     icon: Heart,
     title: "Relationship Background Check",
     description: "Before committing emotionally, verify who you're trusting. Identity checks, social presence review, and AI-powered chat analysis to detect manipulation, lies, or red flags.",
+    href: "/run-check",
   },
   {
     icon: UserCheck,
     title: "Dating Profile Authenticity",
     description: "Not sure if a dating profile is real? We verify face match, social presence, and identity signals to help you avoid catfishing and scams.",
+    href: "/run-check",
   },
   {
     icon: MessageCircle,
     title: "Chat Analysis",
     description: "Upload conversations and get AI insights on emotional manipulation, gaslighting, dominance patterns, and overall relationship health.",
+    href: "/run-check",
   },
   {
     icon: Building,
     title: "Tenant Verification",
     description: "Screen potential tenants with identity verification, employment verification, and rental history before handing over your property.",
+    href: "/use-cases/tenant-screening",
   },
   {
     icon: Users,
     title: "Domestic Worker Verification",
     description: "Verify household staff including maids, drivers, nannies, and cooks with background checks and identity verification.",
+    href: "/use-cases/domestic-worker-verification",
   },
   {
     icon: Briefcase,
     title: "Freelancer Verification",
     description: "Verify freelancers and contractors before hiring — identity, portfolio authenticity, and professional background.",
+    href: "/use-cases/freelancer-verification",
   },
 ];
 
@@ -59,31 +65,37 @@ const businessUseCases = [
     icon: Shield,
     title: "Employee Background Check",
     description: "Enterprise-grade pre-employment screening. Verify identity, criminal records, employment history, and education at scale.",
+    href: "/use-cases/employee-background-check",
   },
   {
     icon: Users,
     title: "Staffing Agency Verification",
     description: "Pre-verify your entire candidate pool. Security guards, housekeeping, delivery partners—every worker gets a verified trust badge.",
+    href: "/use-cases/staffing-agency-verification",
   },
   {
     icon: Home,
     title: "Housing Society Screening",
     description: "Streamline background checks for domestic help, maintenance staff, tenants, and service vendors across hundreds of households.",
+    href: "/use-cases/housing-society-screening",
   },
   {
     icon: Truck,
     title: "Vendor & Supplier Check",
     description: "Verify business partners, vendors, and suppliers before signing contracts. Company registration, compliance, and reputation checks.",
+    href: "/use-cases/vendor-verification",
   },
   {
     icon: Globe,
     title: "Global Identity Verification",
     description: "Verify identities across borders with international document verification and cross-country validation.",
+    href: "/document-verification",
   },
   {
     icon: ShoppingBag,
     title: "Online Seller Verification",
     description: "Verify e-commerce sellers before large purchases. Check business registration and seller credibility.",
+    href: "/business-verification",
   },
 ];
 
@@ -147,9 +159,9 @@ const UseCases = () => {
                 <div className="relative h-full">
                   <UseCaseCard icon={useCase.icon} title={useCase.title} description={useCase.description} />
                   <div className="mt-4 text-center">
-                    <Link to="/run-check">
+                    <Link to={useCase.href}>
                       <Button variant="outline" size="sm" className="gap-2 hover-lift">
-                        Run a Check
+                        Learn More
                         <ArrowRight className="w-3 h-3" />
                       </Button>
                     </Link>
@@ -183,9 +195,9 @@ const UseCases = () => {
                 <div className="relative h-full">
                   <UseCaseCard icon={useCase.icon} title={useCase.title} description={useCase.description} />
                   <div className="mt-4 text-center">
-                    <Link to="/contact">
+                    <Link to={useCase.href}>
                       <Button variant="outline" size="sm" className="gap-2 hover-lift">
-                        Partner With Us
+                        Learn More
                         <ArrowRight className="w-3 h-3" />
                       </Button>
                     </Link>
