@@ -1,8 +1,10 @@
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import usePageMeta from "@/hooks/usePageMeta";
 import { Briefcase } from "lucide-react";
 
 const Careers = () => {
+  usePageMeta({ title: "Careers at VerifyStack – Join Our Team", description: "Join VerifyStack and help build India's trust infrastructure. Explore open positions in engineering, product, and operations." });
   return (
     <div className="min-h-screen bg-background">
       <Header />

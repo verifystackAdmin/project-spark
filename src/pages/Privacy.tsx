@@ -1,7 +1,9 @@
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import usePageMeta from "@/hooks/usePageMeta";
 
 const Privacy = () => {
+  usePageMeta({ title: "Privacy Policy – VerifyStack", description: "Read VerifyStack's privacy policy. Learn how we collect, use, and protect your personal data during AI-powered background verification." });
   return (
     <div className="min-h-screen bg-background">
       <Header />

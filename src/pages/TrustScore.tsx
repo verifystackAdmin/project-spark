@@ -1,4 +1,5 @@
 import Header from "@/components/layout/Header";
+import usePageMeta from "@/hooks/usePageMeta";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -31,6 +32,7 @@ const scoreComponents = [
 ];
 
 const TrustScore = () => {
+  usePageMeta({ title: "Trust Score – AI-Powered Credibility Rating", description: "Understand VerifyStack's Trust Score: a single credibility metric combining document authenticity, identity confirmation, and background screening." });
   return (
     <div className="min-h-screen bg-background">
       <Header />

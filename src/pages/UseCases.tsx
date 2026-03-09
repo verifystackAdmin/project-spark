@@ -1,4 +1,5 @@
 import Header from "@/components/layout/Header";
+import usePageMeta from "@/hooks/usePageMeta";
 import Footer from "@/components/layout/Footer";
 import UseCaseCard from "@/components/UseCaseCard";
 import { Button } from "@/components/ui/button";
@@ -100,6 +101,7 @@ const businessUseCases = [
 ];
 
 const UseCases = () => {
+  usePageMeta({ title: "Use Cases – Background Verification for Every Need", description: "Explore VerifyStack use cases: tenant screening, employee checks, domestic worker verification, freelancer vetting, vendor due diligence & more." });
   return (
     <div className="min-h-screen bg-background">
       <Header />

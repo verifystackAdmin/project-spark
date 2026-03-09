@@ -1,8 +1,10 @@
 import Header from "@/components/layout/Header";
+import usePageMeta from "@/hooks/usePageMeta";
 import Footer from "@/components/layout/Footer";
 import { CheckCircle } from "lucide-react";
 
 const Status = () => {
+  usePageMeta({ title: "System Status – VerifyStack", description: "Check the real-time operational status of VerifyStack services including verification engine, dashboard, payments, and document upload." });
   const services = [
     { name: "Verification Engine", status: "Operational" },
     { name: "User Dashboard", status: "Operational" },

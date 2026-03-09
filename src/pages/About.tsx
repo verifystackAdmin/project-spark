@@ -1,4 +1,5 @@
 import Header from "@/components/layout/Header";
+import usePageMeta from "@/hooks/usePageMeta";
 import Footer from "@/components/layout/Footer";
 import ScrollReveal from "@/components/ScrollReveal";
 import { motion } from "framer-motion";
@@ -19,6 +20,7 @@ const trustSignals = [
 ];
 
 const About = () => {
+  usePageMeta({ title: "About VerifyStack – AI Background Verification", description: "Learn about VerifyStack's mission to democratize trust with AI-powered background verification for businesses, agencies, housing societies & individuals in India." });
   return (
     <div className="min-h-screen bg-background">
       <Header />

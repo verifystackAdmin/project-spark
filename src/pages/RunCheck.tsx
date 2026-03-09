@@ -1,4 +1,5 @@
 import { useState } from "react";
+import usePageMeta from "@/hooks/usePageMeta";
 import { Link } from "react-router-dom";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -59,6 +60,7 @@ const verificationTypes = [
 ];
 
 const RunCheck = () => {
+  usePageMeta({ title: "Run a Verification Check – VerifyStack", description: "Start a background verification check. Upload documents, provide details, and get a comprehensive report with AI-powered Trust Score." });
   const [selectedTypes, setSelectedTypes] = useState<string[]>(["identity"]);
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({

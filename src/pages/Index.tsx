@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import usePageMeta from "@/hooks/usePageMeta";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/layout/Header";
@@ -21,6 +22,7 @@ import { Shield, Sparkles, ArrowRight } from "lucide-react";
 
 const Index = () => {
   const isMobile = useIsMobile();
+  usePageMeta({ title: "VerifyStack – AI Background Verification for India", description: "Enterprise-grade AI-powered background verification for businesses, agencies, housing societies & individuals. Identity checks, criminal records, tenant screening & more." });
 
   return (
     <div className="min-h-screen bg-background">

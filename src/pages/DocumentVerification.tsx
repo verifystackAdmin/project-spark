@@ -1,4 +1,5 @@
 import Header from "@/components/layout/Header";
+import usePageMeta from "@/hooks/usePageMeta";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -11,6 +12,7 @@ import {
 } from "lucide-react";
 
 const IndividualVerification = () => {
+  usePageMeta({ title: "Document Verification – AI-Powered ID Checks", description: "Verify Aadhaar, PAN, passport, driving license & voter ID with AI-powered forgery detection. Instant document authentication by VerifyStack." });
   const supportedDocuments = [
     { name: "Aadhaar Card", icon: FileText },
     { name: "PAN Card", icon: FileText },

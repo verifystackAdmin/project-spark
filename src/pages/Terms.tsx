@@ -1,7 +1,9 @@
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import usePageMeta from "@/hooks/usePageMeta";
 
 const Terms = () => {
+  usePageMeta({ title: "Terms of Service – VerifyStack", description: "Review VerifyStack's terms of service. Understand your rights and responsibilities when using our AI-powered background verification platform." });
   return (
     <div className="min-h-screen bg-background">
       <Header />

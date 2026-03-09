@@ -1,3 +1,4 @@
+// @ts-ignore - jest-dom types may not be installed
 import "@testing-library/jest-dom";
 
 Object.defineProperty(window, "matchMedia", {

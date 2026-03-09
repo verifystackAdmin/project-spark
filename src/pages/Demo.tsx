@@ -1,10 +1,12 @@
 import Header from "@/components/layout/Header";
+import usePageMeta from "@/hooks/usePageMeta";
 import Footer from "@/components/layout/Footer";
 import { LiveDemo } from "@/components/landing/LiveDemo";
 import ScrollReveal from "@/components/ScrollReveal";
 import { Shield, CheckCircle, Lock, Brain } from "lucide-react";
 
 const Demo = () => {
+  usePageMeta({ title: "Live Demo – Try VerifyStack AI Verification", description: "Try VerifyStack's AI-powered background verification demo. See real-time document analysis, identity checks, and trust scoring in action." });
   return (
     <div className="min-h-screen bg-background">
       <Header />

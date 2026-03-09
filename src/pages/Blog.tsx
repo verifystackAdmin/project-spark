@@ -1,4 +1,5 @@
 import Header from "@/components/layout/Header";
+import usePageMeta from "@/hooks/usePageMeta";
 import Footer from "@/components/layout/Footer";
 import { BookOpen, Calendar, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -21,6 +22,7 @@ const blogPosts = [
 ];
 
 const Blog = () => {
+  usePageMeta({ title: "Blog – VerifyStack Verification Insights", description: "Read expert articles on background verification, online safety, tenant screening, and trust-building from the VerifyStack team." });
   return (
     <div className="min-h-screen bg-background">
       <Header />

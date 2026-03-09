@@ -1,4 +1,5 @@
 import Header from "@/components/layout/Header";
+import usePageMeta from "@/hooks/usePageMeta";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -62,6 +63,7 @@ const whatWeVerify = [
 ];
 
 const HowItWorks = () => {
+  usePageMeta({ title: "How It Works – VerifyStack Verification Process", description: "See how VerifyStack's 3-step AI verification works: upload documents, AI analysis, and get a detailed trust score report in minutes." });
   return (
     <div className="min-h-screen bg-background">
       <Header />
