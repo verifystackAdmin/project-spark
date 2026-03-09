@@ -1,7 +1,10 @@
 import UseCasePageLayout from "@/components/UseCasePageLayout";
+import usePageMeta from "@/hooks/usePageMeta";
 import { Users } from "lucide-react";
 
-const DomesticWorkerVerification = () => (
+const DomesticWorkerVerification = () => {
+  usePageMeta({ title: "Domestic Worker Verification – Background Check Maids, Drivers & Nannies", description: "Verify domestic workers with AI: government ID checks, criminal record screening, address verification & reference checks. Instant trust badges." });
+  return (
   <UseCasePageLayout
     badge="Domestic Help Verification"
     title="Verify Household Staff"
