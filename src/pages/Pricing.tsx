@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import usePageMeta from "@/hooks/usePageMeta";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";

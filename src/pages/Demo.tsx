@@ -1,4 +1,5 @@
 import Header from "@/components/layout/Header";
+import usePageMeta from "@/hooks/usePageMeta";
 import Footer from "@/components/layout/Footer";
 import { LiveDemo } from "@/components/landing/LiveDemo";
 import ScrollReveal from "@/components/ScrollReveal";

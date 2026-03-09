@@ -1,4 +1,5 @@
 import Header from "@/components/layout/Header";
+import usePageMeta from "@/hooks/usePageMeta";
 import Footer from "@/components/layout/Footer";
 import UseCaseCard from "@/components/UseCaseCard";
 import { Button } from "@/components/ui/button";

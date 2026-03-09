@@ -1,7 +1,9 @@
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import usePageMeta from "@/hooks/usePageMeta";
 
 const Cookies = () => {
+  usePageMeta({ title: "Cookie Policy – VerifyStack", description: "VerifyStack cookie policy. Understand how we use cookies and tracking technologies on our verification platform." });
   return (
     <div className="min-h-screen bg-background">
       <Header />

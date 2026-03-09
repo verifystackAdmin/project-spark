@@ -1,4 +1,5 @@
 import Header from "@/components/layout/Header";
+import usePageMeta from "@/hooks/usePageMeta";
 import Footer from "@/components/layout/Footer";
 import { BookOpen, Calendar, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";

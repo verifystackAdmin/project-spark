@@ -1,8 +1,10 @@
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import usePageMeta from "@/hooks/usePageMeta";
 import { Code } from "lucide-react";
 
 const ApiDocs = () => {
+  usePageMeta({ title: "API Documentation – VerifyStack", description: "Integrate VerifyStack's AI-powered background verification into your applications with our REST API. Documentation and early access." });
   return (
     <div className="min-h-screen bg-background">
       <Header />
