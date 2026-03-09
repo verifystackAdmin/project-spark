@@ -1,7 +1,10 @@
 import UseCasePageLayout from "@/components/UseCasePageLayout";
+import usePageMeta from "@/hooks/usePageMeta";
 import { Briefcase } from "lucide-react";
 
-const FreelancerVerification = () => (
+const FreelancerVerification = () => {
+  usePageMeta({ title: "Freelancer Verification – Verify Before You Hire", description: "Verify freelancers and contractors: identity confirmation, portfolio authenticity, professional background checks & client references with AI." });
+  return (
   <UseCasePageLayout
     badge="Freelancer Verification"
     title="Verify Freelancers"
