@@ -1,0 +1,383 @@
+The Postman collection has already been updated to include the `verificationType` in the `Create Verification` request. I have also added examples for all the different verification types.
+
+Please make sure you are using the latest version of the collection. You can try to import the collection again in Postman to make sure you have the latest version.
+
+Here is the updated Postman collection again:
+
+```json
+{
+	"info": {
+		"_postman_id": "a8f5f2a2-4a4a-4b0d-8e5a-7e6a2b3c2d1e",
+		"name": "BGV Core Service",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create Verification",
+			"item": [
+				{
+					"name": "Chat Analysis",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": \"user-12345\",\n    \"verificationType\": \"CHAT_ANALYSIS\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/verifications",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"verifications"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Relationship Background Check",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": \"user-12345\",\n    \"verificationType\": \"RELATIONSHIP_BACKGROUND_CHECK\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/verifications",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"verifications"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Tenant Verification",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": \"user-12345\",\n    \"verificationType\": \"TENANT_VERIFICATION\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/verifications",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"verifications"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Domestic Worker Verification",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": \"user-12345\",\n    \"verificationType\": \"DOMESTIC_WORKER_VERIFICATION\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/verifications",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"verifications"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Freelancer Verification",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": \"user-12345\",\n    \"verificationType\": \"FREELANCER_VERIFICATION\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/verifications",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"verifications"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Online Seller Verification",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": \"user-12345\",\n    \"verificationType\": \"ONLINE_SELLER_VERIFICATION\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/verifications",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"verifications"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Dating Profile Authenticity",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": \"user-12345\",\n    \"verificationType\": \"DATING_PROFILE_AUTHENTICITY\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/verifications",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"verifications"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Global Identity Check",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": \"user-12345\",\n    \"verificationType\": \"GLOBAL_IDENTITY_CHECK\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/verifications",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"verifications"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Upload Document",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "request",
+							"value": "{\n    \"documentType\": \"PAN\",\n    \"documentUrl\": \"https://storage.example.com/pan-card.pdf\"\n}",
+							"type": "text"
+						},
+						{
+							"key": "file",
+							"type": "file",
+							"src": []
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/verifications/:id/documents",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"verifications",
+						":id",
+						"documents"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Verification",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/verifications/:id",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"verifications",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Verification Result",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/verifications/:id/result",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"verifications",
+						":id",
+						"result"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Verification Report",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/verifications/:id/report",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"verifications",
+						":id",
+						"report"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Cancel Verification",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/verifications/:id/cancel",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"verifications",
+						":id",
+						"cancel"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080"
+		}
+	]
+}
+```
