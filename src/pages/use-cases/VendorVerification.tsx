@@ -1,7 +1,10 @@
 import UseCasePageLayout from "@/components/UseCasePageLayout";
+import usePageMeta from "@/hooks/usePageMeta";
 import { Truck } from "lucide-react";
 
-const VendorVerification = () => (
+const VendorVerification = () => {
+  usePageMeta({ title: "Vendor Verification – Business Partner Due Diligence", description: "Verify vendors and suppliers: company registration, director screening, financial health, legal compliance & AI-powered reputation analysis." });
+  return (
   <UseCasePageLayout
     badge="Vendor & Supplier Check"
     title="Verify Business Partners"
