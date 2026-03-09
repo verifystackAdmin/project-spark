@@ -5,6 +5,7 @@ import { HelpCircle, FileText, Shield, CreditCard } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Help = () => {
+  usePageMeta({ title: "Help Center – VerifyStack Support", description: "Get help with VerifyStack. Find guides on getting started, account security, billing, and contacting our support team." });
   const topics = [
     { icon: FileText, title: "Getting Started", desc: "Learn how to run your first verification check.", link: "/how-it-works" },
     { icon: Shield, title: "Account & Security", desc: "Manage your account settings, password, and 2FA.", link: "/dashboard/settings" },

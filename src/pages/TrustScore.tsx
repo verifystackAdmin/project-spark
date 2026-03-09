@@ -32,6 +32,7 @@ const scoreComponents = [
 ];
 
 const TrustScore = () => {
+  usePageMeta({ title: "Trust Score – AI-Powered Credibility Rating", description: "Understand VerifyStack's Trust Score: a single credibility metric combining document authenticity, identity confirmation, and background screening." });
   return (
     <div className="min-h-screen bg-background">
       <Header />

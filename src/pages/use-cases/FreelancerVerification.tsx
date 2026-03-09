@@ -33,6 +33,7 @@ const FreelancerVerification = () => {
       { label: "All Use Cases", href: "/use-cases" },
     ]}
   />
-);
+  );
+};
 
 export default FreelancerVerification;

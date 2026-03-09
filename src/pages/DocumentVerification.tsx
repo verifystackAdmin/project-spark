@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 
 const IndividualVerification = () => {
+  usePageMeta({ title: "Document Verification – AI-Powered ID Checks", description: "Verify Aadhaar, PAN, passport, driving license & voter ID with AI-powered forgery detection. Instant document authentication by VerifyStack." });
   const supportedDocuments = [
     { name: "Aadhaar Card", icon: FileText },
     { name: "PAN Card", icon: FileText },

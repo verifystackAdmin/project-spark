@@ -33,6 +33,7 @@ const features = [
 ];
 
 const BusinessVerification = () => {
+  usePageMeta({ title: "Business Verification – Company Due Diligence", description: "Verify company registration, GST, tax records, and compliance status. AI-powered business due diligence and risk assessment by VerifyStack." });
   return (
     <div className="min-h-screen bg-background">
       <Header />

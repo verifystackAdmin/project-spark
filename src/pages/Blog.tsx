@@ -22,6 +22,7 @@ const blogPosts = [
 ];
 
 const Blog = () => {
+  usePageMeta({ title: "Blog – VerifyStack Verification Insights", description: "Read expert articles on background verification, online safety, tenant screening, and trust-building from the VerifyStack team." });
   return (
     <div className="min-h-screen bg-background">
       <Header />

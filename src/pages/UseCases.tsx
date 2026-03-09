@@ -101,6 +101,7 @@ const businessUseCases = [
 ];
 
 const UseCases = () => {
+  usePageMeta({ title: "Use Cases – Background Verification for Every Need", description: "Explore VerifyStack use cases: tenant screening, employee checks, domestic worker verification, freelancer vetting, vendor due diligence & more." });
   return (
     <div className="min-h-screen bg-background">
       <Header />

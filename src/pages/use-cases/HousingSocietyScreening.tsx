@@ -33,6 +33,7 @@ const HousingSocietyScreening = () => {
       { label: "All Use Cases", href: "/use-cases" },
     ]}
   />
-);
+  );
+};
 
 export default HousingSocietyScreening;

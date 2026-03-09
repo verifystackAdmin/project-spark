@@ -11,6 +11,7 @@ import { HelpCircle, Check, User, Building2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const Pricing = () => {
+  usePageMeta({ title: "Pricing – VerifyStack Background Verification Plans", description: "Affordable AI-powered background verification plans for individuals and businesses. Pay-per-check or subscribe for volume discounts." });
   const [plans, setPlans] = useState<Plan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

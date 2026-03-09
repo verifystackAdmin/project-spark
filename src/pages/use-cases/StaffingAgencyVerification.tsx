@@ -33,6 +33,7 @@ const StaffingAgencyVerification = () => {
       { label: "All Use Cases", href: "/use-cases" },
     ]}
   />
-);
+  );
+};
 
 export default StaffingAgencyVerification;

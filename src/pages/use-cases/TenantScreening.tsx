@@ -33,6 +33,7 @@ const TenantScreening = () => {
       { label: "All Use Cases", href: "/use-cases" },
     ]}
   />
-);
+  );
+};
 
 export default TenantScreening;

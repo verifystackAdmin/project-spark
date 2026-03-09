@@ -33,6 +33,7 @@ const VendorVerification = () => {
       { label: "All Use Cases", href: "/use-cases" },
     ]}
   />
-);
+  );
+};
 
 export default VendorVerification;

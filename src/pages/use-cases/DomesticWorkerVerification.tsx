@@ -33,6 +33,7 @@ const DomesticWorkerVerification = () => {
       { label: "All Use Cases", href: "/use-cases" },
     ]}
   />
-);
+  );
+};
 
 export default DomesticWorkerVerification;

@@ -20,6 +20,7 @@ const trustSignals = [
 ];
 
 const About = () => {
+  usePageMeta({ title: "About VerifyStack – AI Background Verification", description: "Learn about VerifyStack's mission to democratize trust with AI-powered background verification for businesses, agencies, housing societies & individuals in India." });
   return (
     <div className="min-h-screen bg-background">
       <Header />

@@ -33,6 +33,7 @@ const EmployeeBackgroundCheck = () => {
       { label: "All Use Cases", href: "/use-cases" },
     ]}
   />
-);
+  );
+};
 
 export default EmployeeBackgroundCheck;

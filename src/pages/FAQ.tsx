@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 
 const FAQ = () => {
+  usePageMeta({ title: "FAQ – VerifyStack Background Verification", description: "Frequently asked questions about VerifyStack's AI-powered background verification platform. Pricing, security, turnaround time & more." });
   const faqs = [
     { q: "What is VerifyStack?", a: "VerifyStack is an AI-powered background verification platform that democratizes trust—making enterprise-grade verification accessible to businesses, agencies, housing societies, and everyday individuals." },
     { q: "Who is VerifyStack for?", a: "VerifyStack serves businesses hiring employees, staffing agencies pre-verifying workforce pools, housing societies screening domestic help and tenants, and individuals verifying nannies, drivers, or partners." },

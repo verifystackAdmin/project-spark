@@ -20,6 +20,7 @@ const partnerTypes = [
 ];
 
 const Contact = () => {
+  usePageMeta({ title: "Contact VerifyStack – Get in Touch", description: "Contact VerifyStack for enterprise background verification, partnership inquiries, or support. Email us or reach out for a demo." });
   return (
     <div className="min-h-screen bg-background">
       <Header />
