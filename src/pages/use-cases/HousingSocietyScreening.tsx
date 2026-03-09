@@ -1,7 +1,10 @@
 import UseCasePageLayout from "@/components/UseCasePageLayout";
+import usePageMeta from "@/hooks/usePageMeta";
 import { Home } from "lucide-react";
 
-const HousingSocietyScreening = () => (
+const HousingSocietyScreening = () => {
+  usePageMeta({ title: "Housing Society Screening – Bulk Staff & Tenant Verification", description: "Streamline background verification for housing societies: bulk staff screening, tenant pre-checks, vendor verification & society admin dashboard." });
+  return (
   <UseCasePageLayout
     badge="Housing Society Security"
     title="Secure Your Community"
