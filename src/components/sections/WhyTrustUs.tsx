@@ -13,11 +13,11 @@ const features = [
 
 const WhyTrustUs = () => {
   return (
-    <section className="py-24 relative overflow-hidden">
+    <section className="py-16 md:py-24 relative overflow-hidden">
       <div className="absolute inset-0 neural-grid opacity-20" />
       <div className="container mx-auto px-4 relative z-10">
         <ScrollReveal>
-          <div className="text-center mb-16">
+          <div className="text-center mb-10 md:mb-16">
             <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-trust/10 text-trust text-xs font-semibold rounded-full mb-4 border border-trust/20 uppercase tracking-widest">
               Security & Compliance
             </span>
@@ -25,8 +25,8 @@ const WhyTrustUs = () => {
               Why Trust VerifyStack?
             </h2>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              Trust is broken when verification is slow, manual, and fragmented.
-              We bring AI-powered verification, real-time data, and compliance-first architecture into one platform.
+              Verification should be fast, automated and complete.
+              VerifyStack brings AI-powered checks, real-time data and compliance tools into one platform.
             </p>
           </div>
         </ScrollReveal>

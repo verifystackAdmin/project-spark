@@ -5,9 +5,20 @@ interface TrustScoreGaugeProps {
   size?: "sm" | "md" | "lg";
   showLabel?: boolean;
   animated?: boolean;
+  /** Plain-language line under the label (e.g. why the score looks like this). */
+  caption?: string;
+  /** Trend vs last run, e.g. "↑ +2 vs last screening". */
+  trendHint?: string;
 }
 
-const TrustScoreGauge = ({ score, size = "md", showLabel = true, animated = true }: TrustScoreGaugeProps) => {
+const TrustScoreGauge = ({
+  score,
+  size = "md",
+  showLabel = true,
+  animated = true,
+  caption,
+  trendHint,
+}: TrustScoreGaugeProps) => {
   const sizes = {
     sm: { width: 120, strokeWidth: 8, fontSize: "text-xl" },
     md: { width: 180, strokeWidth: 12, fontSize: "text-3xl" },
@@ -80,10 +91,12 @@ const TrustScoreGauge = ({ score, size = "md", showLabel = true, animated = true
         </div>
       </div>
       {showLabel && (
-        <div className="text-center">
-          <span className={cn("text-sm font-semibold", getScoreColor())}>
-            {getLabel()}
-          </span>
+        <div className="space-y-1 text-center">
+          <span className={cn("block text-sm font-semibold", getScoreColor())}>{getLabel()}</span>
+          {trendHint ? (
+            <span className="block font-mono text-xs tabular-nums text-muted-foreground">{trendHint}</span>
+          ) : null}
+          {caption ? <p className="max-w-[260px] text-pretty text-xs leading-relaxed text-muted-foreground">{caption}</p> : null}
         </div>
       )}
     </div>

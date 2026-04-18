@@ -1,0 +1,1611 @@
+{
+  "info": {
+    "_postman_id": "vs-complete-2026",
+    "name": "VerifyStack — Full API (single collection)",
+    "description": "**One Postman file for everything** — public **API Gateway** only (`{{gatewayUrl}}`). Do **not** call `*.internal.*.azurecontainerapps.io` from Postman.\n\n---\n### Authentication (read this first)\n| Folders | VerifyStack admin API key? |\n|---------|----------------------------|\n| **00**, **02**, **03**, **04**, **05**, **07**, **08** | **No.** No `X-VerifyStack-Admin-Key` on these requests (today’s repo behavior). Normal BGV + billing subscribe + notification diagnostics work without it. |\n| **01**, **06** | **Yes.** Header **`X-VerifyStack-Admin-Key`** = `{{adminApiKey}}` (same as env **`NOTIFICATION_ADMIN_API_KEY`** / GitHub secret). Only **`/api/v1/billing/admin/**`** and **`/api/v1/notifications/admin/**`** need this. |\n\n**Local docker:** if `NOTIFICATION_ADMIN_API_KEY` is unset, services default to **`dev-notification-admin-key`** — Postman’s `adminApiKey` matches that.\n\n**Future:** You can put admin UIs behind your own login or gateway; **product integrations** can keep using **00 → 02 → 03 → 04 → 05** without ever setting `adminApiKey`.\n\n---\n### Run order\n**00** Health → **01** Admin plan setup (operators) → **02** Subscribe → **03** BGV + consent → **04** Reports → **05** Notification smoke tests → **06** Admin templates & analytics (operators) → **07** Billing internals (debug) → **08** Local docker actuators only.\n\n**KYC Hub mock (optional, not gateway):** `postman/KYC-Hub-Mock.postman_collection.json` — use when `KYC_HUB_MOCK=true` / Postman mock URL.\n\n**Variables:** `planId`, `subscriptionId`, `reportId` (auto-set by scripts); `planFeatureId` (paste from **GET** `.../admin/plans` → `plan.features[].featureId` for folder **01** PATCH/DELETE feature). **`adminApiKey`** — only for folders **01** and **06**. `aggregationUrl`, `workerUrl`, … only for **08**.\n\n---\n### For UI / frontend — submit a BGV report (live API)\n\n**1) Prerequisites (once per user)**\n- Admin has created an **active** plan and attached every **feature** the UI can request (use `GET /api/v1/billing/admin/features` or catalog `check-feature-codes`).\n- User has **subscribed**: `POST /api/v1/billing/subscriptions/{planId}` with `userId`, `tenantId` (for individuals, **same email** for both is typical, e.g. `divyanshbhatt0@gmail.com`).\n- `tenantId` on the subscription **must** match `tenantId` in the report body below (billing keys entitlement by tenant).\n\n**2) Submit report**\n- **Method/URL:** `POST {{gatewayUrl}}/api/v1/orchestrator/reports`\n- **Headers:** `Content-Type: application/json` (no admin API key on this route).\n- **Body (JSON):**\n  - `requesterId` (string, required): signed-in account id — usually email.\n  - `tenantId` (string, optional but **required for correct billing**): same as subscription `tenantId`; if omitted, backend uses `requesterId`.\n  - `subjectFullName` (string, required)\n  - `subjectPhone` (string, required)\n  - `requestedChecks` (array of strings, required): **CheckType** enum names, uppercase with underscores.\n\n**3) “Full verification” package =5 checks**\nUse exactly:\n```\n[\"IDENTITY_PAN\",\"IDENTITY_AADHAAR\",\"EMPLOYMENT_EPFO\",\"COURT_RECORD\",\"CREDIT_REPORT\"]\n```\n`CREDIT_REPORT` is billed as feature **`CIBIL_CHECK`** on the plan. All five features must exist on the user’s plan or the API returns **402 Payment Required**.\n\n**4) Example (copy-paste body)**\n```json\n{\n  \"requesterId\": \"divyanshbhatt0@gmail.com\",\n  \"tenantId\": \"divyanshbhatt0@gmail.com\",\n  \"subjectFullName\": \"Ramesh Kumar Singh\",\n  \"subjectPhone\": \"9876543210\",\n  \"requestedChecks\": [\n    \"IDENTITY_PAN\",\n    \"IDENTITY_AADHAAR\",\n    \"EMPLOYMENT_EPFO\",\n    \"COURT_RECORD\",\n    \"CREDIT_REPORT\"\n  ]\n}\n```\n\n**5) Response:** `202 Accepted` with `{ \"reportId\": \"...\" }`. Then: **Grant consent** (`POST .../consent/{reportId}/grant`), poll pipeline (`GET .../aggregation/reports/{reportId}/pipeline`), load report (`GET .../reports/{reportId}`) — see folders **03** and **04**.\n\n**Admin API key:** Only folders **01** and **06** — paths under **`/api/v1/billing/admin/**`** and **`/api/v1/notifications/admin/**`**. Orchestrator submit and user flows do not use this header.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "gatewayUrl",
+      "value": "http://localhost:8080",
+      "description": "**Primary** — all `/api/v1/*` traffic (Azure: public ingress only)"
+    },
+    {
+      "key": "billingUrl",
+      "value": "http://localhost:8094",
+      "description": "Local docker only — prefer `{{gatewayUrl}}/api/v1/billing/...`"
+    },
+    {
+      "key": "orchestratorUrl",
+      "value": "http://localhost:8081",
+      "description": "Local debug — use gateway `/api/v1/orchestrator/...` instead"
+    },
+    {
+      "key": "consentUrl",
+      "value": "http://localhost:8082",
+      "description": "Local debug — use gateway `/api/v1/consent/...`"
+    },
+    {
+      "key": "aggregationUrl",
+      "value": "http://localhost:8083",
+      "description": "Local debug — use gateway `/api/v1/aggregation/...`"
+    },
+    {
+      "key": "workerUrl",
+      "value": "http://localhost:8085",
+      "description": "Kafka worker — no public API; local actuator only"
+    },
+    {
+      "key": "reportGenUrl",
+      "value": "http://localhost:8086",
+      "description": "Local debug — use gateway `/api/v1/reports/...`"
+    },
+    {
+      "key": "notifUrl",
+      "value": "http://localhost:8087",
+      "description": "Local debug — use gateway `/api/v1/notifications/...`"
+    },
+    {
+      "key": "planId",
+      "value": "",
+      "description": "Set by: Create Plan → auto-populated"
+    },
+    {
+      "key": "planFeatureId",
+      "value": "",
+      "description": "Paste from GET /api/v1/billing/admin/plans → plan.features[].featureId (for 1j / 1k)"
+    },
+    {
+      "key": "subscriptionId",
+      "value": "",
+      "description": "Set by: Create Subscription → auto-populated"
+    },
+    {
+      "key": "reportId",
+      "value": "",
+      "description": "Set by: Submit BGV Report → auto-populated"
+    },
+    {
+      "key": "requesterId",
+      "value": "divyanshbhatt0@gmail.com",
+      "description": "Signed-in user id (email for B2C) — must match subscription userId / tenant story"
+    },
+    {
+      "key": "tenantId",
+      "value": "divyanshbhatt0@gmail.com",
+      "description": "Billing tenant — must match CreateSubscription body tenantId (same as email for individuals)"
+    },
+    {
+      "key": "downloadUrl",
+      "value": "",
+      "description": "Set by: 04b Get Report Detail → auto-populated"
+    },
+    {
+      "key": "adminApiKey",
+      "value": "dev-notification-admin-key",
+      "description": "**Folders 01 + 06 only.** Same as NOTIFICATION_ADMIN_API_KEY. Not used for BGV flows (02–05). Header: X-VerifyStack-Admin-Key"
+    },
+    {
+      "key": "notificationInternalKey",
+      "value": "dev-notification-internal-key",
+      "description": "Same as NOTIFICATION_INTERNAL_API_KEY / VERIFYSTACK_NOTIFICATION_INTERNAL_KEY — header X-VerifyStack-Internal-Key for folders 05f–05g (direct notification-webhook only)"
+    },
+    {
+      "key": "frontendUrl",
+      "value": "http://localhost:3000",
+      "description": "SPA origin — must match bgv-auth FRONTEND_URL for real reset links; used in 05g sample body"
+    }
+  ],
+  "item": [
+    {
+      "name": "00 — Health Checks",
+      "description": "**No admin API key.** On **Azure**, only the **API Gateway** is publicly reachable — use these checks first.\n\nFolder **08** uses `localhost`/`docker-compose` ports for deep debugging (not available from Postman against the cloud env).",
+      "item": [
+        {
+          "name": "API Gateway",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{gatewayUrl}}/actuator/health",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "actuator",
+                "health"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Billing (via gateway actuator)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/billing/actuator/health",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "billing",
+                "actuator",
+                "health"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Check ↔ feature_code catalog",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/billing/catalog/check-feature-codes",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "billing",
+                "catalog",
+                "check-feature-codes"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "01 — Admin: Plan setup (API key required)",
+      "description": "**Operators only** — end-user apps skip this folder after the environment is configured.\n\nCreate a billing plan via **`/api/v1/billing/admin/**`**. Run once per environment. `planId` is auto-set by **1a**.\n\n**Auth:** **`X-VerifyStack-Admin-Key: {{adminApiKey}}`**.\n\n**Per-check metering:** one plan feature per `featureCode` from folder **06** (GET admin/features) or **00** (catalog). E.g. `CIBIL_CHECK` for UI check `CREDIT_REPORT`. Legacy `BGV_REPORT`-only plans will not satisfy batch entitlement.",
+      "auth": {
+        "type": "apikey",
+        "apikey": [
+          {
+            "key": "key",
+            "value": "X-VerifyStack-Admin-Key",
+            "type": "string"
+          },
+          {
+            "key": "value",
+            "value": "{{adminApiKey}}",
+            "type": "string"
+          },
+          {
+            "key": "in",
+            "value": "header",
+            "type": "string"
+          }
+        ]
+      },
+      "item": [
+        {
+          "name": "1a. Create Plan — BGV_STANDARD",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.planId) {",
+                  "    pm.collectionVariables.set('planId', res.planId);",
+                  "    console.log('planId saved:', res.planId);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"BGV_STANDARD\",\n  \"name\": \"BGV Standard Plan\",\n  \"type\": \"SUBSCRIPTION\",\n  \"price\": 9999.00,\n  \"currency\": \"INR\",\n  \"billingPeriod\": \"MONTHLY\",\n  \"accessDurationDays\": null\n}"
+            },
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/billing/admin/plans",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "billing",
+                "admin",
+                "plans"
+              ]
+            }
+          }
+        },
+        {
+          "name": "1b. Add Feature — IDENTITY_PAN (UNLIMITED)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"featureCode\": \"IDENTITY_PAN\",\n  \"quota\": null,\n  \"quotaType\": \"UNLIMITED\",\n  \"allowOverage\": false\n}"
+            },
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/billing/admin/plans/{{planId}}/features",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "billing",
+                "admin",
+                "plans",
+                "{{planId}}",
+                "features"
+              ]
+            }
+          }
+        },
+        {
+          "name": "1c. Add Feature — IDENTITY_AADHAAR (UNLIMITED)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"featureCode\": \"IDENTITY_AADHAAR\",\n  \"quota\": null,\n  \"quotaType\": \"UNLIMITED\",\n  \"allowOverage\": false\n}"
+            },
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/billing/admin/plans/{{planId}}/features",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "billing",
+                "admin",
+                "plans",
+                "{{planId}}",
+                "features"
+              ]
+            }
+          }
+        },
+        {
+          "name": "1d. Add Feature — EMPLOYMENT_EPFO (UNLIMITED)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"featureCode\": \"EMPLOYMENT_EPFO\",\n  \"quota\": null,\n  \"quotaType\": \"UNLIMITED\",\n  \"allowOverage\": false\n}"
+            },
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/billing/admin/plans/{{planId}}/features",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "billing",
+                "admin",
+                "plans",
+                "{{planId}}",
+                "features"
+              ]
+            }
+          }
+        },
+        {
+          "name": "1e. Add Feature — COURT_RECORD (500 / mo)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"featureCode\": \"COURT_RECORD\",\n  \"quota\": 500,\n  \"quotaType\": \"LIMITED\",\n  \"allowOverage\": false\n}"
+            },
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/billing/admin/plans/{{planId}}/features",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "billing",
+                "admin",
+                "plans",
+                "{{planId}}",
+                "features"
+              ]
+            }
+          }
+        },
+        {
+          "name": "1f. Add Feature — CIBIL_CHECK (500 / mo)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"featureCode\": \"CIBIL_CHECK\",\n  \"quota\": 500,\n  \"quotaType\": \"LIMITED\",\n  \"allowOverage\": true,\n  \"overageUnitPrice\": 199.00\n}"
+            },
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/billing/admin/plans/{{planId}}/features",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "billing",
+                "admin",
+                "plans",
+                "{{planId}}",
+                "features"
+              ]
+            }
+          }
+        },
+        {
+          "name": "1g. Activate Plan",
+          "request": {
+            "method": "PATCH",
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/billing/admin/plans/{{planId}}/activate",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "billing",
+                "admin",
+                "plans",
+                "{{planId}}",
+                "activate"
+              ]
+            }
+          }
+        },
+        {
+          "name": "1h. Update Plan Price (optional)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"price\": 12500.00,\n  \"currency\": \"INR\"\n}"
+            },
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/billing/admin/plans/{{planId}}/price",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "billing",
+                "admin",
+                "plans",
+                "{{planId}}",
+                "price"
+              ]
+            }
+          }
+        },
+        {
+          "name": "1i. Deactivate Plan",
+          "request": {
+            "method": "PATCH",
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/billing/admin/plans/{{planId}}/deactivate",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "billing",
+                "admin",
+                "plans",
+                "{{planId}}",
+                "deactivate"
+              ]
+            },
+            "description": "Sets plan to INACTIVE (hidden from new checkout). Existing subscriptions are unchanged."
+          }
+        },
+        {
+          "name": "1j. PATCH plan feature (partial)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quota\": 750,\n  \"quotaType\": \"LIMITED\",\n  \"allowOverage\": true,\n  \"overageUnitPrice\": 150.00\n}"
+            },
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/billing/admin/plans/{{planId}}/features/{{planFeatureId}}",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "billing",
+                "admin",
+                "plans",
+                "{{planId}}",
+                "features",
+                "{{planFeatureId}}"
+              ]
+            },
+            "description": "Omit JSON fields you do not want to change. Set `planFeatureId` from folder **06** → GET admin/plans → `plan.features[].featureId`."
+          }
+        },
+        {
+          "name": "1k. DELETE plan feature line",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/billing/admin/plans/{{planId}}/features/{{planFeatureId}}",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "billing",
+                "admin",
+                "plans",
+                "{{planId}}",
+                "features",
+                "{{planFeatureId}}"
+              ]
+            },
+            "description": "Removes the feature from the plan definition. Does not remove existing subscription buckets."
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 — User: Browse Plans & Subscribe",
+      "description": "**No admin API key.** Requester (HR, landlord, agency) browses active plans and subscribes.\n`subscriptionId` is auto-set by **2b**.",
+      "item": [
+        {
+          "name": "2a. List Active Plans",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/billing/plans",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "billing",
+                "plans"
+              ]
+            }
+          }
+        },
+        {
+          "name": "2b. Create Subscription",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.subscriptionId) {",
+                  "    pm.collectionVariables.set('subscriptionId', res.subscriptionId);",
+                  "    console.log('subscriptionId saved:', res.subscriptionId);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{requesterId}}\",\n  \"orgId\": null,\n  \"tenantId\": \"{{tenantId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/billing/subscriptions/{{planId}}",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "billing",
+                "subscriptions",
+                "{{planId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "2c. View My Subscriptions",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/billing/subscriptions/me?userId={{requesterId}}",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "billing",
+                "subscriptions",
+                "me"
+              ],
+              "query": [
+                {
+                  "key": "userId",
+                  "value": "{{requesterId}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 — BGV Core Flow",
+      "description": "**No admin API key.** The main verification pipeline. Run Step 1 then Step 2 in sequence.\n\n**UI:** `requestedChecks` must be **CheckType** names (see collection description). Full package = all five: PAN, Aadhaar, EPFO, Court, Credit. **tenantId** must match the subscription created in folder 02.\n\nWhat happens automatically after granting consent:\n  bgv.consent.received\n    → worker-identity: calls KYC Hub PAN/EPFO/Court APIs, publishes bgv.data.fetched per check\n    → aggregation-service: scores when all checks arrive, publishes bgv.scoring.complete\n    → report-generator: renders PDF, uploads to blob/tmp, publishes bgv.report.ready\n    → notification-webhook: sends email + HTTP POST webhook",
+      "item": [
+        {
+          "name": "Step 1 — Submit BGV Report (via API Gateway)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.reportId) {",
+                  "    pm.collectionVariables.set('reportId', res.reportId);",
+                  "    console.log('reportId saved:', res.reportId);",
+                  "    console.log('Now run: Step 2 — Grant Consent with this reportId');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"requesterId\": \"{{requesterId}}\",\n  \"tenantId\": \"{{tenantId}}\",\n  \"subjectFullName\": \"Ramesh Kumar Singh\",\n  \"subjectPhone\": \"9876543210\",\n  \"requestedChecks\": [\n    \"IDENTITY_PAN\",\n    \"IDENTITY_AADHAAR\",\n    \"EMPLOYMENT_EPFO\",\n    \"COURT_RECORD\",\n    \"CREDIT_REPORT\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/orchestrator/reports",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orchestrator",
+                "reports"
+              ]
+            },
+            "description": "Submits a new BGV request.\n- **No** `X-VerifyStack-Admin-Key` on this route.\n- Billing **batch** reserve: one feature per check (e.g. `CREDIT_REPORT` → `CIBIL_CHECK`)\n- `tenantId` must match folder **02** subscription (same email for B2C is typical)\n- Returns **402** if plan lacks any requested feature\n- Report is INITIATED; Kafka publishes `bgv.request.initiated`\n\nCatalog: `GET {{gatewayUrl}}/api/v1/billing/catalog/check-feature-codes`"
+          }
+        },
+        {
+          "name": "Step 1 (alt) — Submit BGV Report TENANT CHECK",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"requesterId\": \"{{requesterId}}\",\n  \"tenantId\": \"{{tenantId}}\",\n  \"subjectFullName\": \"Suresh Narayan Patel\",\n  \"subjectPhone\": \"8765432109\",\n  \"requestedChecks\": [\n    \"IDENTITY_PAN\",\n    \"COURT_RECORD\"\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/orchestrator/reports",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orchestrator",
+                "reports"
+              ]
+            },
+            "description": "Tenant / domestic staff check — only PAN + court checks (no employment)."
+          }
+        },
+        {
+          "name": "Step 1 (alt) — Submit BGV Report DOMESTIC WORKER",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"requesterId\": \"{{requesterId}}\",\n  \"tenantId\": \"{{tenantId}}\",\n  \"subjectFullName\": \"Meena Devi Sharma\",\n  \"subjectPhone\": \"7654321098\",\n  \"requestedChecks\": [\n    \"IDENTITY_PAN\",\n    \"COURT_RECORD\"\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/orchestrator/reports",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orchestrator",
+                "reports"
+              ]
+            },
+            "description": "Maid / domestic worker check."
+          }
+        },
+        {
+          "name": "Step 2 — Grant Consent (via API Gateway)",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/consent/{{reportId}}/grant",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "consent",
+                "{{reportId}}",
+                "grant"
+              ]
+            },
+            "description": "Subject taps 'Allow' on the consent screen (simulating DigiLocker callback).\n- Consent audit log is written to MongoDB\n- `bgv.consent.received` (status=GRANTED) is published\n- Triggers worker-identity → aggregation → report-generator → notification pipeline automatically"
+          }
+        },
+        {
+          "name": "Step 2 (alt) — Deny Consent",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/consent/{{reportId}}/deny",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "consent",
+                "{{reportId}}",
+                "deny"
+              ]
+            },
+            "description": "Subject declines consent. worker-identity receives DENIED status and stops. No checks are run.\nThe billing reservation will be released by the orchestrator on denial (future enhancement)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 — Dashboard & Report Endpoints",
+      "description": "**No admin API key.** Endpoints used by the frontend dashboard (dashboard/report.html).\n\nTypical UI flow after granting consent:\n  1. Poll 04a every 3s while pipelineStatus != COMPLETE  → show progress bar\n  2. When COMPLETE → call 04b to get full report + scores  → render dashboard\n  3. Call 04c to download/preview the PDF\n  4. Call 04d for the requester's 'My Reports' table",
+      "item": [
+        {
+          "name": "04a. Live Pipeline Status (poll every 3s)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/aggregation/reports/{{reportId}}/pipeline",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "aggregation",
+                "reports",
+                "{{reportId}}",
+                "pipeline"
+              ]
+            },
+            "description": "Returns real-time progress of the Kafka pipeline for a report.\n\nPoll this while pipelineStatus is GATHERING or SCORING.\nSwitch to 04b when pipelineStatus = COMPLETE.\n\nResponse:\n  pipelineStatus    : GATHERING | SCORING | COMPLETE\n  expectedChecks    : all check types requested\n  checksReceived    : checks that have come back from KYC Hub\n  checksRemaining   : checks still in flight\n  progressPercent   : 0-100"
+          }
+        },
+        {
+          "name": "04b. Get Report Detail (final scores + PDF link)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.downloadUrl) {",
+                  "    pm.collectionVariables.set('downloadUrl', res.downloadUrl);",
+                  "    console.log('Report status:', res.overallStatus, '| PDF:', res.downloadUrl);",
+                  "}",
+                  "if (res.scoringBreakdown) {",
+                  "    console.log('Breakdown:', JSON.stringify(res.scoringBreakdown, null, 2));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/reports/{{reportId}}",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "reports",
+                "{{reportId}}"
+              ]
+            },
+            "description": "Returns full report detail once generation is complete.\n\nResponse includes:\n  overallStatus     : GREEN | AMBER | RED\n  scoringBreakdown  : legacy five (identity, aadhaar, court, employment, creditReport) plus optional additionalScores map (CheckType → { flag, matchScore, remarks })\n  requestedChecks   : check types that were run\n  downloadUrl       : relative URL to fetch the PDF\n  reportUrl         : direct blob URL (Azure SAS) or file:// path (local)\n  generatedAt       : ISO timestamp\n\n404 if not generated yet — check pipeline status first."
+          }
+        },
+        {
+          "name": "04c. Download PDF Report",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/reports/{{reportId}}/download",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "reports",
+                "{{reportId}}",
+                "download"
+              ]
+            },
+            "description": "Downloads or redirects to the generated PDF.\n\nProduction (Azure Blob):   302 redirect to SAS URL → browser opens/saves directly\nLocal Docker fallback:     streams PDF bytes as application/pdf inline\n\n202 if still GENERATING (check pipeline status first)\n404 if reportId not found"
+          }
+        },
+        {
+          "name": "04d. List My Reports (paginated)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/reports?requesterId={{requesterId}}&page=0&size=20&sortDir=desc&from=&to=",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "reports"
+              ],
+              "query": [
+                {
+                  "key": "requesterId",
+                  "value": "{{requesterId}}",
+                  "description": "The HR/landlord/agency who submitted the reports"
+                },
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20",
+                  "description": "Max 100 per page"
+                },
+                {
+                  "key": "sortDir",
+                  "value": "desc",
+                  "description": "Sort by generatedAt: asc | desc (default desc)"
+                },
+                {
+                  "key": "from",
+                  "value": "",
+                  "description": "Optional ISO-8601 instant filter: generatedAt >= from (e.g. 2026-01-01T00:00:00Z)"
+                },
+                {
+                  "key": "to",
+                  "value": "",
+                  "description": "Optional ISO-8601 instant filter: generatedAt <= to"
+                }
+              ]
+            },
+            "description": "Paginated list of all reports for a requester — default newest first (sortDir=desc).\nOptional filters: from / to bound generatedAt (inclusive). sortDir=asc for oldest first.\n\nResponse: Spring Page<ReportSummaryResponse>\n  content[].reportId        : unique report ID\n  content[].subjectFullName : subject name\n  content[].overallStatus   : GREEN | AMBER | RED\n  content[].status          : GENERATING | UPLOADED | FAILED\n  content[].downloadUrl     : PDF download link\n  content[].generatedAt     : ISO timestamp\n  totalElements             : total count for pagination"
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 — Notifications & Diagnostics",
+      "description": "**No admin API key** on gateway routes here (repo default).\n\n**Auth emails (welcome + forgot password):** bgv-auth calls notification-webhook with **`X-VerifyStack-Internal-Key`**. Set **`VERIFYSTACK_NOTIFICATION_INTERNAL_KEY`** on auth = **`NOTIFICATION_INTERNAL_API_KEY`** on notification-webhook. Set **`RESEND_API_KEY`** or SMTP on notification-webhook. **`NOTIFICATION_DRY_RUN`** does not block auth emails.\n\n**Test order:** (1) **05f** or **05g** direct to `{{notifUrl}}` to verify mail delivery; (2) **05h** forgot-password via gateway (LOCAL users only); (3) register new LOCAL user to trigger welcome.\n\nSmoke-test notification-webhook without waiting for a full pipeline run.\n\nEndpoints:\n  POST /notifications/test-email   — send a test BGV-ready email (bypasses dry-run flag)\n  POST /notifications/test-webhook — fire a test POST to any URL (e.g. webhook.site)\n  GET  /notifications/logs/{id}    — see what was sent for a specific report\n  GET  /notifications/logs?requesterId=&limit= — last N events; optional requesterId scopes to that user (email)\n  GET  /reports/{id}/status        — lightweight PDF-ready check (no scoring payload)\n\n**Pipeline (Kafka `bgv.report.ready`):** delivery respects `NOTIFICATION_DRY_RUN` on notification-webhook. Infra / CI default is **`false`** so emails send when `RESEND_API_KEY` or SMTP is configured. If you see **`SKIPPED_DRY_RUN`** in logs, dry-run is still `true` in that environment.\n\nConfigure RESEND_API_KEY for HTTPS (recommended) or SMTP (Brevo/Gmail). Response includes delivery (resend vs smtp).",
+      "item": [
+        {
+          "name": "05a. Test Email (via Gateway)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/notifications/test-email",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notifications",
+                "test-email"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"to\": \"{{requesterId}}\",\n  \"subjectName\": \"Rahul Sharma\",\n  \"overallStatus\": \"GREEN\",\n  \"reportId\": \"{{reportId}}\"\n}"
+            },
+            "description": "Sends a real BGV-ready email to the specified address.\n\nBypasses the dry-run flag — even if NOTIFICATION_DRY_RUN=true, this endpoint will attempt actual delivery.\n\nUses Resend when RESEND_API_KEY is set; otherwise SMTP. Verify sender domain in Resend for NOTIFICATION_FROM."
+          }
+        },
+        {
+          "name": "05b. Test Webhook (via Gateway)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/notifications/test-webhook",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notifications",
+                "test-webhook"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"webhookUrl\": \"https://webhook.site/REPLACE-WITH-YOUR-ID\",\n  \"subjectName\": \"Rahul Sharma\",\n  \"overallStatus\": \"GREEN\",\n  \"reportId\": \"{{reportId}}\"\n}"
+            },
+            "description": "POSTs a bgv.report.ready event to any HTTPS URL.\n\nGet a free inspection URL at https://webhook.site — paste the unique URL into webhookUrl.\n\nExpected POST body delivered to your webhook:\n{\n  \"event\":          \"bgv.report.ready\",\n  \"reportId\":       \"...\",\n  \"requesterId\":    \"test-requester\",\n  \"subjectFullName\":\"Rahul Sharma\",\n  \"overallStatus\":  \"GREEN\",\n  \"reportUrl\":      \"http://...\",\n  \"generatedAt\":    \"2026-04-04T...\"\n}"
+          }
+        },
+        {
+          "name": "05c. Notification Logs for Report (via Gateway)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/notifications/logs/{{reportId}}",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notifications",
+                "logs",
+                "{{reportId}}"
+              ]
+            },
+            "description": "Returns all email + webhook log entries for a specific report.\n\nEach entry shows:\n  channel   : EMAIL | WEBHOOK\n  status    : SENT | FAILED | SKIPPED_DRY_RUN\n  recipient : email address or webhook URL\n  sentAt    : ISO timestamp\n  errorMessage : populated on failure\n\n`SKIPPED_DRY_RUN` = `NOTIFICATION_DRY_RUN=true` (no real send). `SENT`/`FAILED` = dry-run off and provider attempted delivery."
+          }
+        },
+        {
+          "name": "05d. Recent Notification Logs (via Gateway)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/notifications/logs?requesterId={{requesterId}}&limit=50",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notifications",
+                "logs"
+              ],
+              "query": [
+                {
+                  "key": "requesterId",
+                  "value": "{{requesterId}}",
+                  "description": "Submitter email (or other requester id). Omit for global recent logs (ops)."
+                },
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            },
+            "description": "Returns the last N notification attempts, newest first.\n\nPass **requesterId** (same value as package submit `requesterId`, often an email) to list only that user's delivery events in one call. Omit **requesterId** to see recent events across all reports (operator health-check). **limit** defaults to 20, max 100."
+          }
+        },
+        {
+          "name": "05e. PDF Ready Status (via Gateway)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/reports/{{reportId}}/status",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "reports",
+                "{{reportId}}",
+                "status"
+              ]
+            },
+            "description": "Lightweight endpoint — returns just the generation status and whether the PDF is available.\nMuch cheaper to poll than the full GET /reports/{id}.\n\nResponse:\n  status      : GENERATING | UPLOADED | FAILED\n  pdfReady    : true when status=UPLOADED and reportUrl is set\n  reportUrl   : local file path or Azure SAS URL\n  downloadUrl : relative /reports/{id}/download path (null until pdfReady)\n  generatedAt : ISO timestamp\n\nPoll this every 5s after pipelineStatus=COMPLETE until pdfReady=true, then fetch the full detail."
+          }
+        },
+        {
+          "name": "05f. Auth — welcome email (direct notification-webhook)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-VerifyStack-Internal-Key",
+                "value": "{{notificationInternalKey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"to\": \"{{requesterId}}\",\n  \"recipientName\": \"VerifyStack tester\",\n  \"dashboardUrl\": \"{{frontendUrl}}\",\n  \"productName\": \"VerifyStack\"\n}"
+            },
+            "url": {
+              "raw": "{{notifUrl}}/notifications/internal/auth-emails/welcome",
+              "host": [
+                "{{notifUrl}}"
+              ],
+              "path": [
+                "notifications",
+                "internal",
+                "auth-emails",
+                "welcome"
+              ]
+            },
+            "description": "**Not proxied by API gateway** — call **notification-webhook** on `{{notifUrl}}` (docker: `http://localhost:8087`).\n\nExpect **204** if mail sends. On failure, read notification-webhook logs (`Auth email sent` / `Auth email failed`).\n\nRequires: **`NOTIFICATION_INTERNAL_API_KEY`** on webhook = **`notificationInternalKey`**; **Resend or SMTP** configured."
+          }
+        },
+        {
+          "name": "05g. Auth — password-reset email (direct notification-webhook)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-VerifyStack-Internal-Key",
+                "value": "{{notificationInternalKey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"to\": \"{{requesterId}}\",\n  \"recipientName\": \"VerifyStack tester\",\n  \"resetLink\": \"{{frontendUrl}}/reset-password?token=demo-token-from-forgot-flow\",\n  \"productName\": \"VerifyStack\"\n}"
+            },
+            "url": {
+              "raw": "{{notifUrl}}/notifications/internal/auth-emails/password-reset",
+              "host": [
+                "{{notifUrl}}"
+              ],
+              "path": [
+                "notifications",
+                "internal",
+                "auth-emails",
+                "password-reset"
+              ]
+            },
+            "description": "Same as **05f** — isolates Resend/SMTP + templates. Replace `demo-token...` with a real token from Mongo `password_reset_tokens` after **05h** if testing the full flow."
+          }
+        },
+        {
+          "name": "05h. Auth — forgot password (via gateway)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{requesterId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/auth/forgot-password",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "forgot-password"
+              ]
+            },
+            "description": "End-to-end path: auth saves a token and POSTs to notification-webhook.\n\n**LOCAL accounts only** — Google sign-in users get no mail (by design). Unknown emails return the same success message (anti-enumeration).\n\nIf no email arrives: set **`VERIFYSTACK_NOTIFICATION_URI`** + **`VERIFYSTACK_NOTIFICATION_INTERNAL_KEY`** on **bgv-auth**; match webhook **`NOTIFICATION_INTERNAL_API_KEY`**; configure **RESEND_API_KEY** or **MAIL_*** on notification-webhook; align **`FRONTEND_URL`** on auth with your SPA (`frontendUrl`)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 — Admin: Auth templates, catalog & analytics (API key required)",
+      "description": "**Same auth as folder 01:** `X-VerifyStack-Admin-Key: {{adminApiKey}}`.\n\nUse for operator dashboards: welcome / password-reset email HTML, billing feature catalog, plan list with subscriber counts, usage analytics. **Not** required for BGV product flows (02–05).",
+      "auth": {
+        "type": "apikey",
+        "apikey": [
+          {
+            "key": "key",
+            "value": "X-VerifyStack-Admin-Key",
+            "type": "string"
+          },
+          {
+            "key": "value",
+            "value": "{{adminApiKey}}",
+            "type": "string"
+          },
+          {
+            "key": "in",
+            "value": "header",
+            "type": "string"
+          }
+        ]
+      },
+      "item": [
+        {
+          "name": "6a. GET auth email templates",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/notifications/admin/auth-email-templates",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notifications",
+                "admin",
+                "auth-email-templates"
+              ]
+            },
+            "description": "Returns subjects, HTML bodies, optional `additionalTemplates` (id/subject/htmlBody), `updatedAt`, and `placeholdersHint`.\n\nPlaceholders — welcome: `{{recipientName}}`, `{{dashboardUrl}}`, `{{productName}}`. Password reset: `{{recipientName}}`, `{{resetLink}}`, `{{productName}}`. Custom rows: same `{{...}}` style."
+          }
+        },
+        {
+          "name": "6b. PUT auth email templates",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"welcomeSubject\": \"Welcome to {{productName}}\",\n  \"welcomeHtmlBody\": \"<!DOCTYPE html><html><head><meta charset=\\\"UTF-8\\\"/></head><body style=\\\"font-family:system-ui,sans-serif;max-width:560px;margin:0 auto;padding:24px;\\\"><p>Hi {{recipientName}},</p><p>Welcome to <strong>{{productName}}</strong>.</p><p><a href=\\\"{{dashboardUrl}}\\\" style=\\\"display:inline-block;background:#2563eb;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:600;\\\">Open dashboard</a></p><p style=\\\"font-size:13px;color:#64748b;\\\">If you did not create this account, ignore this email.</p></body></html>\",\n  \"passwordResetSubject\": \"Reset your {{productName}} password\",\n  \"passwordResetHtmlBody\": \"<!DOCTYPE html><html><head><meta charset=\\\"UTF-8\\\"/></head><body style=\\\"font-family:system-ui,sans-serif;max-width:560px;margin:0 auto;padding:24px;\\\"><p>Hi {{recipientName}},</p><p>Reset your password for <strong>{{productName}}</strong>.</p><p><a href=\\\"{{resetLink}}\\\" style=\\\"display:inline-block;background:#2563eb;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:600;\\\">Reset password</a></p><p style=\\\"font-size:13px;color:#64748b;\\\">Link expires in one hour.</p></body></html>\",\n  \"additionalTemplates\": [\n    {\n      \"id\": \"email_verification\",\n      \"subject\": \"Verify your {{productName}} email\",\n      \"htmlBody\": \"<p>Hi {{recipientName}},</p><p><a href=\\\"{{verifyLink}}\\\">Verify email</a></p>\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/notifications/admin/auth-email-templates",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notifications",
+                "admin",
+                "auth-email-templates"
+              ]
+            },
+            "description": "Max lengths: subjects 300 chars; HTML bodies 200_000 chars. `additionalTemplates`: optional array (max 50); each `id` slug `[a-z][a-z0-9_]*` (max 64). Omit `additionalTemplates` to leave custom rows unchanged; send `[]` to clear."
+          }
+        },
+        {
+          "name": "6c. List plans + activeSubscriberCount",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/billing/admin/plans",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "billing",
+                "admin",
+                "plans"
+              ]
+            },
+            "description": "Each row: plan + `activeSubscriberCount`."
+          }
+        },
+        {
+          "name": "6d. GET feature catalog (admin dropdown)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/billing/admin/features?includeInactive=false",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "billing",
+                "admin",
+                "features"
+              ],
+              "query": [
+                {
+                  "key": "includeInactive",
+                  "value": "false"
+                }
+              ]
+            },
+            "description": "Valid `featureCode` values to attach on plans (folder 01)."
+          }
+        },
+        {
+          "name": "6d2. GET feature catalog (include inactive)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/billing/admin/features?includeInactive=true",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "billing",
+                "admin",
+                "features"
+              ],
+              "query": [
+                {
+                  "key": "includeInactive",
+                  "value": "true"
+                }
+              ]
+            },
+            "description": "Admin table: shows deactivated catalog rows too."
+          }
+        },
+        {
+          "name": "6d3. PATCH catalog feature active",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"active\": false\n}"
+            },
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/billing/admin/features/CIBIL_CHECK",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "billing",
+                "admin",
+                "features",
+                "CIBIL_CHECK"
+              ]
+            },
+            "description": "Toggle whether **new** addFeature to plans is allowed for this code. Change path segment to another `featureCode`. Existing plan lines / buckets are not auto-removed."
+          }
+        },
+        {
+          "name": "6e. Analytics — usage by feature",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/billing/admin/analytics/usage-by-feature",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "billing",
+                "admin",
+                "analytics",
+                "usage-by-feature"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "to",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "tenantId",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Optional ISO-8601 `from`/`to` (default last 30 days). Optional `tenantId`."
+          }
+        },
+        {
+          "name": "6f. Analytics — usage by plan",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/billing/admin/analytics/usage-by-plan",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "billing",
+                "admin",
+                "analytics",
+                "usage-by-plan"
+              ]
+            }
+          }
+        },
+        {
+          "name": "6g. Analytics — subscriptions by plan",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/billing/admin/analytics/subscriptions-by-plan",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "billing",
+                "admin",
+                "analytics",
+                "subscriptions-by-plan"
+              ]
+            }
+          }
+        },
+        {
+          "name": "6h. Analytics — entitlement events",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/billing/admin/analytics/entitlement-events?limit=50",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "billing",
+                "admin",
+                "analytics",
+                "entitlement-events"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50"
+                },
+                {
+                  "key": "cursor",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Cursor pagination — enable `cursor` query for next page."
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 — Billing Internals (Reference)",
+      "description": "**No admin API key.** These endpoints are called automatically by the orchestrator — not part of the normal manual flow. For debugging only.\n\n**Batch:** orchestrator uses `POST .../entitlements/check-batch` with `tenantId`, optional `requesterId` (fallback when sub is keyed by userId), and `lines` (featureCode + count per check).",
+      "item": [
+        {
+          "name": "Check & Reserve Entitlement (batch)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tenantId\": \"{{tenantId}}\",\n  \"requesterId\": \"{{requesterId}}\",\n  \"lines\": [\n    { \"featureCode\": \"IDENTITY_PAN\", \"count\": 1 },\n    { \"featureCode\": \"IDENTITY_AADHAAR\", \"count\": 1 },\n    { \"featureCode\": \"EMPLOYMENT_EPFO\", \"count\": 1 },\n    { \"featureCode\": \"COURT_RECORD\", \"count\": 1 },\n    { \"featureCode\": \"CIBIL_CHECK\", \"count\": 1 }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/billing/entitlements/check-batch",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "billing",
+                "entitlements",
+                "check-batch"
+              ]
+            },
+            "description": "Mirrors orchestrator batch reserve. `requesterId` optional but helps when ACTIVE sub is on userId and tenantId alone does not match."
+          }
+        },
+        {
+          "name": "Check & Reserve Entitlement",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{requesterId}}\",\n  \"orgId\": null,\n  \"featureCode\": \"BGV_REPORT\",\n  \"count\": 3\n}"
+            },
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/billing/entitlements/check",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "billing",
+                "entitlements",
+                "check"
+              ]
+            },
+            "description": "Reserves N units from the user's active subscription quota.\nReturns a reservationId used to commit or release later.\ncount = number of requestedChecks in the report."
+          }
+        },
+        {
+          "name": "Commit Usage (billing deducted)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reservationId\": \"PASTE_RESERVATION_ID_HERE\"\n}"
+            },
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/billing/usage/commit",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "billing",
+                "usage",
+                "commit"
+              ]
+            },
+            "description": "Called when report is successfully delivered — permanently deducts from quota."
+          }
+        },
+        {
+          "name": "Release Usage (reservation cancelled)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reservationId\": \"PASTE_RESERVATION_ID_HERE\"\n}"
+            },
+            "url": {
+              "raw": "{{gatewayUrl}}/api/v1/billing/usage/release",
+              "host": [
+                "{{gatewayUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "billing",
+                "usage",
+                "release"
+              ]
+            },
+            "description": "Called when report initiation fails — returns reserved units to the quota pool."
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 — Local docker only (direct ports)",
+      "description": "**No admin API key.** Requires **localhost** (`docker-compose`). **Not used on Azure** — internal apps have no public ingress.",
+      "item": [
+        {
+          "name": "Worker Identity — Metrics",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{workerUrl}}/actuator/metrics",
+              "host": [
+                "{{workerUrl}}"
+              ],
+              "path": [
+                "actuator",
+                "metrics"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Report Generator — Health (with Blob Storage)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{reportGenUrl}}/actuator/health",
+              "host": [
+                "{{reportGenUrl}}"
+              ],
+              "path": [
+                "actuator",
+                "health"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Notification Webhook — Health",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{notifUrl}}/actuator/health",
+              "host": [
+                "{{notifUrl}}"
+              ],
+              "path": [
+                "actuator",
+                "health"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Aggregation Service — Health",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{aggregationUrl}}/actuator/health",
+              "host": [
+                "{{aggregationUrl}}"
+              ],
+              "path": [
+                "actuator",
+                "health"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

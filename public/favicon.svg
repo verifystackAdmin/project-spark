@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="vs-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0EA5E9"/>
+      <stop offset="100%" stop-color="#1E3A8A"/>
+    </linearGradient>
+    <linearGradient id="vs-inner" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1E3A8A"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+  </defs>
+  <!-- Rounded tile: reads clearly in tabs & Google SERP -->
+  <rect width="64" height="64" rx="14" fill="url(#vs-bg)"/>
+  <!-- Shield (VerifyStack mark — no blur; stays sharp when rasterized to .ico) -->
+  <path
+    d="M32 10 L48 17.5 V33.5 C48 43.5 32 54 32 54 C32 54 16 43.5 16 33.5 V17.5 Z"
+    fill="url(#vs-inner)"
+  />
+  <!-- High-contrast check: thick stroke for 16×16 favicon clarity -->
+  <path
+    d="M22 33 L29 41 L44 22"
+    stroke="#FFFFFF"
+    stroke-width="4.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <!-- Brand accent nodes (subtle at tiny sizes, visible at 32px+) -->
+  <circle cx="20" cy="18" r="2.5" fill="#7DD3FC"/>
+  <circle cx="44" cy="18" r="2.5" fill="#7DD3FC"/>
+</svg>

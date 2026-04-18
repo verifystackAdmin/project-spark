@@ -1,6 +1,6 @@
 import Header from "@/components/layout/Header";
-import usePageMeta from "@/hooks/usePageMeta";
 import Footer from "@/components/layout/Footer";
+import HeroBackground from "@/components/layout/HeroBackground";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
@@ -63,17 +63,13 @@ const whatWeVerify = [
 ];
 
 const HowItWorks = () => {
-  usePageMeta({ title: "How It Works – VerifyStack Verification Process", description: "See how VerifyStack's 3-step AI verification works: upload documents, AI analysis, and get a detailed trust score report in minutes." });
   return (
     <div className="min-h-screen bg-background">
       <Header />
 
       {/* Hero Section */}
-      <section className="pt-32 pb-16 bg-gradient-to-b from-muted/50 to-background relative overflow-hidden">
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-20 left-[10%] w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-10 right-[15%] w-96 h-96 bg-accent/10 rounded-full blur-3xl" />
-        </div>
+      <section className="relative border-b border-border/30 pt-32 pb-16 overflow-hidden">
+        <HeroBackground vibe="corporate" />
 
         <div className="container mx-auto px-4 text-center relative z-10">
           <Badge variant="secondary" className="mb-4 px-4 py-1.5 text-sm font-semibold">

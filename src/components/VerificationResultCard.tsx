@@ -55,32 +55,38 @@ const VerificationResultCard = ({
   return (
     <div
       className={cn(
-        "rounded-xl border p-5 transition-all duration-300 hover:shadow-md",
+        "relative overflow-hidden rounded-xl border p-4 transition-all duration-300 hover:shadow-md sm:p-5",
         config.bg,
-        config.border
+        config.border,
       )}
     >
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-card flex items-center justify-center shadow-sm">
-            <Icon className="w-5 h-5 text-primary" />
-          </div>
-          <div>
-            <h4 className="font-semibold text-foreground">{title}</h4>
-            <p className="text-xs text-muted-foreground">{description}</p>
-          </div>
+      {/* Icon + full-width text block so descriptions never squeeze beside the badge */}
+      <div className="flex gap-3 sm:gap-4">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-card shadow-sm">
+          <Icon className="h-5 w-5 text-primary" />
         </div>
-        <div className={cn("flex items-center gap-1.5", config.iconColor)}>
-          <StatusIcon
-            className={cn("w-5 h-5", status === "pending" && "animate-spin")}
-          />
-          <span className="text-sm font-medium">{config.label}</span>
+        <div className="min-w-0 flex-1 space-y-2">
+          <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-1">
+            <h4 className="min-w-0 flex-1 text-base font-semibold leading-snug tracking-tight text-foreground text-pretty">
+              {title}
+            </h4>
+            <div
+              className={cn(
+                "flex shrink-0 items-center gap-1.5 rounded-full bg-card/80 px-2 py-0.5",
+                config.iconColor,
+              )}
+            >
+              <StatusIcon className={cn("h-4 w-4 shrink-0 sm:h-5 sm:w-5", status === "pending" && "animate-spin")} />
+              <span className="whitespace-nowrap text-xs font-medium sm:text-sm">{config.label}</span>
+            </div>
+          </div>
+          <p className="text-xs leading-relaxed text-muted-foreground text-pretty hyphens-none [word-break:normal]">
+            {description}
+          </p>
         </div>
       </div>
       {details && (
-        <p className="text-sm text-muted-foreground mt-3 pt-3 border-t border-border/50">
-          {details}
-        </p>
+        <p className="mt-3 border-t border-border/50 pt-3 text-sm text-muted-foreground">{details}</p>
       )}
     </div>
   );

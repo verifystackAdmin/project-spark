@@ -1,9 +1,9 @@
 import Header from "@/components/layout/Header";
-import usePageMeta from "@/hooks/usePageMeta";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ArrowRight, FileCheck, UserCheck, ShieldCheck, BrainCircuit } from "lucide-react";
+import HeroBackground from "@/components/layout/HeroBackground";
 import TrustScoreGauge from "@/components/TrustScoreGauge";
 
 const scoreComponents = [
@@ -32,17 +32,20 @@ const scoreComponents = [
 ];
 
 const TrustScore = () => {
-  usePageMeta({ title: "Trust Score – AI-Powered Credibility Rating", description: "Understand VerifyStack's Trust Score: a single credibility metric combining document authenticity, identity confirmation, and background screening." });
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <main>
         {/* Hero Section */}
-        <section className="py-24">
-          <div className="container mx-auto px-4">
+        <section className="relative pt-32 pb-24 overflow-hidden border-b border-border/30">
+          <HeroBackground
+            imageUrl="https://images.pexels.com/photos/3861969/pexels-photo-3861969.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+            altText="Abstract AI visualization"
+          />
+          <div className="container mx-auto px-4 relative z-10">
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div className="text-center md:text-left">
-                <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+                <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4 gradient-text">
                   The VerifyStack Trust Score
                 </h1>
                 <p className="max-w-xl text-lg text-muted-foreground">
@@ -62,7 +65,7 @@ const TrustScore = () => {
         <section className="py-24 bg-secondary/50">
           <div className="container mx-auto px-4">
             <div className="text-center mb-16">
-              <h2 className="text-3xl font-bold">How the Trust Score Works</h2>
+              <h2 className="text-3xl font-bold text-foreground gradient-text">How the Trust Score Works</h2>
               <p className="text-muted-foreground">
                 Our score is calculated from hundreds of data points across multiple vectors.
               </p>
@@ -86,7 +89,7 @@ const TrustScore = () => {
         {/* CTA Section */}
         <section className="py-24 text-center">
           <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold text-foreground mb-4">
+            <h2 className="text-3xl font-bold text-foreground mb-4 gradient-text">
               Make Smarter, Faster Decisions
             </h2>
             <p className="text-lg text-muted-foreground mb-8">

@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
 import { Shield } from "lucide-react";
+import { CALENDLY_BOOK_DEMO_URL } from "@/lib/siteLinks";
 
 const footerLinks = {
   product: [
     { name: "Features", href: "/#features" },
     { name: "Pricing", href: "/pricing" },
-    { name: "Demo", href: "/demo" },
+    { name: "Book a demo", href: CALENDLY_BOOK_DEMO_URL },
     { name: "API Docs", href: "/api-docs" },
     { name: "Dashboard", href: "/dashboard" },
   ],
@@ -60,12 +61,23 @@ export const EnterpriseFooter = () => {
               <ul className="mt-4 space-y-2">
                 {footerLinks.product.map((link) => (
                   <li key={link.name}>
-                    <Link
-                      to={link.href}
-                      className="text-sm text-slate-400 hover:text-white transition-colors"
-                    >
-                      {link.name}
-                    </Link>
+                    {link.href.startsWith("http") ? (
+                      <a
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-slate-400 hover:text-white transition-colors"
+                      >
+                        {link.name}
+                      </a>
+                    ) : (
+                      <Link
+                        to={link.href}
+                        className="text-sm text-slate-400 hover:text-white transition-colors"
+                      >
+                        {link.name}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>

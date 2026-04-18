@@ -1,28 +1,10 @@
 import Header from "@/components/layout/Header";
-import usePageMeta from "@/hooks/usePageMeta";
 import Footer from "@/components/layout/Footer";
 import { BookOpen, Calendar, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-
-const blogPosts = [
-  {
-    title: "5 Red Flags to Watch for When Dating Online",
-    excerpt: "Online dating has made it easier than ever to meet new people — but it's also made it easier for dishonest individuals to hide their true identity. Here are the top red flags you should never ignore.",
-    date: "January 10, 2026",
-    category: "Safety Tips",
-    readTime: "4 min read",
-  },
-  {
-    title: "Why Background Verification Is the New Normal in Relationships",
-    excerpt: "Trust is the foundation of every relationship. With AI-powered verification, you can now confirm someone's identity, employment, and social history before making life-changing decisions.",
-    date: "January 22, 2026",
-    category: "Insights",
-    readTime: "5 min read",
-  },
-];
+import { blogPostList } from "@/data/blogPosts";
 
 const Blog = () => {
-  usePageMeta({ title: "Blog – VerifyStack Verification Insights", description: "Read expert articles on background verification, online safety, tenant screening, and trust-building from the VerifyStack team." });
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -37,10 +19,15 @@ const Blog = () => {
           </div>
 
           <div className="space-y-8">
-            {blogPosts.map((post, i) => (
-              <article key={i} className="p-6 md:p-8 rounded-xl border border-border bg-card hover:shadow-lg transition-shadow">
-                <div className="flex items-center gap-3 mb-3">
-                  <span className="text-xs font-semibold px-3 py-1 rounded-full bg-primary/10 text-primary">{post.category}</span>
+            {blogPostList.map((post, i) => (
+              <article
+                key={post.slug ?? `draft-${i}`}
+                className="p-6 md:p-8 rounded-xl border border-border bg-card hover:shadow-lg transition-shadow"
+              >
+                <div className="flex items-center gap-3 mb-3 flex-wrap">
+                  <span className="text-xs font-semibold px-3 py-1 rounded-full bg-primary/10 text-primary">
+                    {post.category}
+                  </span>
                   <span className="flex items-center gap-1 text-xs text-muted-foreground">
                     <Calendar className="w-3 h-3" />
                     {post.date}
@@ -49,9 +36,18 @@ const Blog = () => {
                 </div>
                 <h2 className="text-2xl font-bold text-foreground mb-3">{post.title}</h2>
                 <p className="text-muted-foreground mb-4 leading-relaxed">{post.excerpt}</p>
-                <span className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline cursor-pointer">
-                  Read more <ArrowRight className="w-4 h-4" />
-                </span>
+                {post.slug ? (
+                  <Link
+                    to={`/blog/${post.slug}`}
+                    className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+                  >
+                    Read more <ArrowRight className="w-4 h-4" />
+                  </Link>
+                ) : (
+                  <span className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground">
+                    Full article coming soon <ArrowRight className="w-4 h-4 opacity-50" />
+                  </span>
+                )}
               </article>
             ))}
           </div>

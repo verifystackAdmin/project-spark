@@ -2,6 +2,7 @@ import { Button } from "../ui/button";
 import { Check } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "../../lib/utils";
+import { CALENDLY_BOOK_DEMO_URL } from "../../lib/siteLinks";
 
 const tiers = [
   {
@@ -10,7 +11,7 @@ const tiers = [
     priceSuffix: "",
     description: "For individuals and small projects getting started.",
     features: [
-      "5 Verifications/month",
+      "5 checks included per plan",
       "Basic Identity Checks",
       "Community Support",
     ],
@@ -21,10 +22,10 @@ const tiers = [
   {
     name: "Pro",
     price: "$99",
-    priceSuffix: "/ month",
+    priceSuffix: "/ plan",
     description: "For growing platforms that need more power and support.",
     features: [
-      "500 Verifications/month",
+      "500 checks included per plan",
       "Advanced Identity & Social Analysis",
       "AI Risk Scoring",
       "Developer API Access",
@@ -46,8 +47,8 @@ const tiers = [
       "Dedicated Account Manager",
       "SLA & 24/7 Support",
     ],
-    cta: "Contact Sales",
-    ctaLink: "/contact",
+    cta: "Book a demo",
+    ctaLink: CALENDLY_BOOK_DEMO_URL,
     isFeatured: false,
   },
 ];
@@ -101,15 +102,21 @@ export const Pricing = () => {
                   ))}
                 </ul>
               </div>
-              <Link to={tier.ctaLink} className="mt-8">
-                <Button
-                  size="lg"
-                  variant={tier.isFeatured ? "hero" : "outline"}
-                  className="w-full"
-                >
-                  {tier.cta}
-                </Button>
-              </Link>
+              <div className="mt-8">
+                {tier.ctaLink.startsWith("http") ? (
+                  <Button size="lg" variant={tier.isFeatured ? "hero" : "outline"} className="w-full" asChild>
+                    <a href={tier.ctaLink} target="_blank" rel="noopener noreferrer">
+                      {tier.cta}
+                    </a>
+                  </Button>
+                ) : (
+                  <Link to={tier.ctaLink} className="block">
+                    <Button size="lg" variant={tier.isFeatured ? "hero" : "outline"} className="w-full">
+                      {tier.cta}
+                    </Button>
+                  </Link>
+                )}
+              </div>
             </div>
           ))}
         </div>

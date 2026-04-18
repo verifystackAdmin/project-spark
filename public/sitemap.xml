@@ -31,7 +31,7 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://verifystack.in/use-cases/domestic-worker-verification</loc>
+    <loc>https://verifystack.in/solutions/domestic-worker-verification</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -61,6 +61,46 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://verifystack.in/solutions/business-background-verification</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/solutions/tenant-property-verification</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/solutions/personal-identity-verification</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/solutions/domestic-worker-verification</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/use-cases/domestic-worker-verification</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/product/verifystack-shield</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/product/verifystack-riskengine</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/product/verifystack-trustscore</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
     <loc>https://verifystack.in/document-verification</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -79,6 +119,61 @@
     <loc>https://verifystack.in/blog</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/blog/degree-mills-forged-certificates-education-verification-2026</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/blog/landlords-checklist-2026-handover-property-management</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/blog/maid-digital-verification-aadhaar-not-enough-2026</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/blog/vendor-due-diligence-b2b-contractors-2026</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/blog/employee-background-verification-india-2026</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/about/team</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/careers</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/help</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/status</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.35</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/security</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.45</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/sample-report</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.55</priority>
   </url>
   <url>
     <loc>https://verifystack.in/contact</loc>
@@ -109,5 +204,145 @@
     <loc>https://verifystack.in/terms</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/use-case/employment-verification</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.72</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/use-case/education-verification</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.72</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/use-case/contractor-vendor-verification</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.72</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/use-case/address-verification</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.72</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/use-case/criminal-record-check</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.72</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/use-case/identity-verification</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.72</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/use-case/tenant-verification</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.72</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/use-case/roommate-verification</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.72</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/use-case/pg-resident-verification</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.72</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/use-case/rental-background-check</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.72</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/use-case/maid-verification</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.72</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/use-case/driver-verification</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.72</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/use-case/caregiver-verification</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.72</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/use-case/cook-verification</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.72</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/use-case/househelp-background-check</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.72</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/use-case/relationship-background-check</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.72</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/use-case/dating-profile-verification</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.72</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/use-case/online-seller-verification</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.72</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/use-case/social-risk-check</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.72</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/use-case/freelancer-verification</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.72</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/product/business-background-verification</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/product/tenant-property-verification</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/product/personal-identity-verification</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/product/domestic-worker-verification</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/refund</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.25</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/cookies</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.25</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/newsletter</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.35</priority>
+  </url>
+  <url>
+    <loc>https://verifystack.in/sample-report/view</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url>
 </urlset>

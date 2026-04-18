@@ -13,7 +13,7 @@ const benefits = [
 
 const AgencyFocus = () => {
   return (
-    <section className="py-24 relative overflow-hidden">
+    <section className="py-16 md:py-24 relative overflow-hidden">
       <div className="absolute inset-0 neural-grid opacity-20" />
       <div className="container mx-auto px-4 relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
@@ -61,7 +61,7 @@ const AgencyFocus = () => {
                 Verify Your Workforce at the Source
               </h2>
               <p className="text-muted-foreground mb-6 leading-relaxed">
-                Enable agencies to pre-verify their entire candidate pool. Market as "Verified-Only Workforce Providers" and build unmatched credibility with enterprise clients.
+                Enables agencies to pre-verify their entire candidate pool. Market as a verified-only workforce provider and build credibility with enterprise clients.
               </p>
               <ul className="space-y-3 mb-8">
                 {benefits.map((benefit, i) => (

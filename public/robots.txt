@@ -1,3 +1,16 @@
+# Public marketing & content — allow
+# App / auth / admin — save crawl budget (thin or private)
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /login
+Disallow: /signup
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /upload-documents
+Disallow: /run-check
+
 User-agent: Googlebot
 Allow: /
 
@@ -8,9 +21,6 @@ User-agent: Twitterbot
 Allow: /
 
 User-agent: facebookexternalhit
-Allow: /
-
-User-agent: *
 Allow: /
 
 Sitemap: https://verifystack.in/sitemap.xml

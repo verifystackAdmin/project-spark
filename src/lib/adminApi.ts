@@ -129,7 +129,7 @@ const adminRequest = async <T>(
 
   if (response.status === 401) {
     clearTokens();
-    window.location.href = "/admin/login";
+    window.location.href = "/login";
     throw new Error("Session expired");
   }
 

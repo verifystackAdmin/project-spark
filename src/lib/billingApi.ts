@@ -1,5 +1,15 @@
 import { billingApiClient as apiClient } from "./api";
 
+/**
+ * Local dev: prefix with `/api` so requests hit the Vite proxy (`/api/billing` → billing service)
+ * and stay same-origin (no browser CORS). Production uses absolute `VITE_BILLING_API_URL` or the Render URL.
+ */
+function billingPath(path: string): string {
+  if (import.meta.env.VITE_BILLING_API_URL) return path;
+  if (import.meta.env.DEV) return `/api${path}`;
+  return path;
+}
+
 // Types
 export interface Plan {
   id: string;
@@ -87,7 +97,7 @@ export interface ApiResponse<T> {
 
 // API Functions
 export const getPlans = async (): Promise<ApiResponse<Plan[]>> => {
-  const rawPlans = await apiClient.request<any[]>("/billing/plans");
+  const rawPlans = await apiClient.request<any[]>(billingPath("/billing/plans"));
   const plans: Plan[] = rawPlans.map(p => ({
     ...p,
     features: p.features || [], // Ensure features is an array, default to empty
@@ -96,32 +106,32 @@ export const getPlans = async (): Promise<ApiResponse<Plan[]>> => {
 };
 
 export const getMySubscription = async (): Promise<ApiResponse<Subscription>> => {
-  return apiClient.request<ApiResponse<Subscription>>("/billing/subscriptions/me");
+  return apiClient.request<ApiResponse<Subscription>>(billingPath("/billing/subscriptions/me"));
 };
 
 export const subscribeToPlan = async (planId: string): Promise<ApiResponse<Subscription>> => {
-  return apiClient.request<ApiResponse<Subscription>>(`/billing/subscriptions/${planId}`, {
+  return apiClient.request<ApiResponse<Subscription>>(billingPath(`/billing/subscriptions/${planId}`), {
     method: "POST",
   });
 };
 
 // Public APIs
 export const checkEntitlement = async (data: EntitlementCheckRequest): Promise<ApiResponse<EntitlementCheckResponse>> => {
-  return apiClient.request<ApiResponse<EntitlementCheckResponse>>("/billing/entitlements/check", {
+  return apiClient.request<ApiResponse<EntitlementCheckResponse>>(billingPath("/billing/entitlements/check"), {
     method: "POST",
     body: JSON.stringify(data),
   });
 };
 
 export const commitUsage = async (data: CommitUsageRequest): Promise<ApiResponse<any>> => {
-  return apiClient.request<ApiResponse<any>>("/billing/usage/commit", {
+  return apiClient.request<ApiResponse<any>>(billingPath("/billing/usage/commit"), {
     method: "POST",
     body: JSON.stringify(data),
   });
 };
 
 export const releaseUsage = async (data: ReleaseUsageRequest): Promise<ApiResponse<any>> => {
-  return apiClient.request<ApiResponse<any>>("/billing/usage/release", {
+  return apiClient.request<ApiResponse<any>>(billingPath("/billing/usage/release"), {
     method: "POST",
     body: JSON.stringify(data),
   });
@@ -129,27 +139,27 @@ export const releaseUsage = async (data: ReleaseUsageRequest): Promise<ApiRespon
 
 // Admin APIs
 export const createPlan = async (data: CreatePlanRequest): Promise<ApiResponse<AdminPlanResponse>> => {
-  return apiClient.request<ApiResponse<AdminPlanResponse>>("/billing/admin/plans", {
+  return apiClient.request<ApiResponse<AdminPlanResponse>>(billingPath("/billing/admin/plans"), {
     method: "POST",
     body: JSON.stringify(data),
   });
 };
 
 export const addFeatureToPlan = async (planId: string, data: AddFeatureToPlanRequest): Promise<ApiResponse<AdminPlanResponse>> => {
-  return apiClient.request<ApiResponse<AdminPlanResponse>>(`/billing/admin/plans/${planId}/features`, {
+  return apiClient.request<ApiResponse<AdminPlanResponse>>(billingPath(`/billing/admin/plans/${planId}/features`), {
     method: "POST",
     body: JSON.stringify(data),
   });
 };
 
 export const activatePlan = async (planId: string): Promise<ApiResponse<AdminPlanResponse>> => {
-  return apiClient.request<ApiResponse<AdminPlanResponse>>(`/billing/admin/plans/${planId}/activate`, {
+  return apiClient.request<ApiResponse<AdminPlanResponse>>(billingPath(`/billing/admin/plans/${planId}/activate`), {
     method: "PATCH",
   });
 };
 
 export const updatePlanPrice = async (planId: string, data: UpdatePlanPriceRequest): Promise<ApiResponse<AdminPlanResponse>> => {
-  return apiClient.request<ApiResponse<AdminPlanResponse>>(`/billing/admin/plans/${planId}/price`, {
+  return apiClient.request<ApiResponse<AdminPlanResponse>>(billingPath(`/billing/admin/plans/${planId}/price`), {
     method: "PUT",
     body: JSON.stringify(data),
   });

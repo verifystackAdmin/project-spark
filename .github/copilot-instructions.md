@@ -1,4 +1,4 @@
-# VerifyMe AI Core - Copilot Instructions
+# VerifyStack — Copilot Instructions
 
 ## Architecture Overview
 This is a React SPA verification platform built with Vite, TypeScript, Tailwind CSS, and shadcn/ui components. It integrates with a BGV Auth Service for authentication and provides AI-powered verification checks (identity, face match, phone credibility, social media analysis, chat analysis).

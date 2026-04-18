@@ -1,0 +1,44 @@
+﻿<svg viewBox="35 25 630 185" width="630" height="185" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0EA5E9"/>
+      <stop offset="100%" stop-color="#1E3A8A"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E3A8A"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Shield Base -->
+  <path d="M120 30 L200 60 L200 130 Q160 180 120 200 Q80 180 40 130 L40 60 Z"
+        fill="url(#g1)"/>
+
+  <!-- Inner Layer -->
+  <path d="M120 50 L180 75 L180 130 Q150 165 120 180 Q90 165 60 130 L60 75 Z"
+        fill="url(#g2)"/>
+
+  <!-- Checkmark -->
+  <path d="M80 115 L110 145 L165 80"
+        fill="none" stroke="white" stroke-width="10"
+        stroke-linecap="round" stroke-linejoin="round"
+        filter="url(#glow)"/>
+
+  <!-- Circuit Nodes -->
+  <circle cx="70" cy="45" r="5" fill="#38BDF8"/>
+  <circle cx="95" cy="35" r="4" fill="#38BDF8"/>
+  <circle cx="120" cy="45" r="5" fill="#38BDF8"/>
+
+  <!-- Circuit Lines -->
+  <line x1="70" y1="45" x2="95" y2="35" stroke="#38BDF8" stroke-width="2"/>
+  <line x1="95" y1="35" x2="120" y2="45" stroke="#38BDF8" stroke-width="2"/>
+
+  <!-- Wordmark -->
+  <text x="230" y="130" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif" font-size="72" font-weight="700" letter-spacing="-1">
+    <tspan fill="#FFFFFF">Verify</tspan><tspan fill="#0EA5E9" font-weight="400">Stack</tspan>
+  </text>
+</svg>

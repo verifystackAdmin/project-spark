@@ -1,10 +1,7 @@
 import UseCasePageLayout from "@/components/UseCasePageLayout";
-import usePageMeta from "@/hooks/usePageMeta";
 import { Briefcase } from "lucide-react";
 
-const FreelancerVerification = () => {
-  usePageMeta({ title: "Freelancer Verification – Verify Before You Hire", description: "Verify freelancers and contractors: identity confirmation, portfolio authenticity, professional background checks & client references with AI." });
-  return (
+const FreelancerVerification = () => (
   <UseCasePageLayout
     badge="Freelancer Verification"
     title="Verify Freelancers"
@@ -28,12 +25,11 @@ const FreelancerVerification = () => {
     ]}
     relatedPages={[
       { label: "Employee Background Check", href: "/use-cases/employee-background-check" },
-      { label: "Domestic Worker Verification", href: "/use-cases/domestic-worker-verification" },
+      { label: "Domestic Worker Verification", href: "/solutions/domestic-worker-verification" },
       { label: "Vendor Verification", href: "/use-cases/vendor-verification" },
       { label: "All Use Cases", href: "/use-cases" },
     ]}
   />
-  );
-};
+);
 
 export default FreelancerVerification;

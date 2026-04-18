@@ -1,0 +1,20 @@
+# Mirrors public/_redirects for clarity; Netlify merges both.
+# Primary domain: https://verifystack.in (apex). Force HTTPS.
+
+[[redirects]]
+  from = "http://www.verifystack.in/*"
+  to = "https://verifystack.in/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://www.verifystack.in/*"
+  to = "https://verifystack.in/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://verifystack.in/*"
+  to = "https://verifystack.in/:splat"
+  status = 301
+  force = true

@@ -9,18 +9,18 @@ interface ScrollRevealProps {
 }
 
 const variants = {
-  up: { hidden: { opacity: 0, y: 60 }, visible: { opacity: 1, y: 0 } },
-  left: { hidden: { opacity: 0, x: -60 }, visible: { opacity: 1, x: 0 } },
-  right: { hidden: { opacity: 0, x: 60 }, visible: { opacity: 1, x: 0 } },
-  scale: { hidden: { opacity: 0, scale: 0.85 }, visible: { opacity: 1, scale: 1 } },
+  up:    { hidden: { opacity: 0, y: 28 },        visible: { opacity: 1, y: 0 } },
+  left:  { hidden: { opacity: 0, x: -28 },       visible: { opacity: 1, x: 0 } },
+  right: { hidden: { opacity: 0, x: 28 },        visible: { opacity: 1, x: 0 } },
+  scale: { hidden: { opacity: 0, scale: 0.92 },  visible: { opacity: 1, scale: 1 } },
 };
 
 const ScrollReveal = ({ children, className, delay = 0, direction = "up" }: ScrollRevealProps) => (
   <motion.div
     initial="hidden"
     whileInView="visible"
-    viewport={{ once: true, margin: "-80px" }}
-    transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
+    viewport={{ once: true, margin: "-60px" }}
+    transition={{ duration: 0.45, delay, ease: [0.22, 1, 0.36, 1] }}
     variants={variants[direction]}
     className={className}
   >

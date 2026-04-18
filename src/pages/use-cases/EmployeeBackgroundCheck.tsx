@@ -1,10 +1,7 @@
 import UseCasePageLayout from "@/components/UseCasePageLayout";
-import usePageMeta from "@/hooks/usePageMeta";
 import { Shield } from "lucide-react";
 
-const EmployeeBackgroundCheck = () => {
-  usePageMeta({ title: "Employee Background Check – Pre-Employment Screening", description: "Enterprise-grade employee background verification: identity, criminal records, education, employment history & reference checks at scale." });
-  return (
+const EmployeeBackgroundCheck = () => (
   <UseCasePageLayout
     badge="Employee Screening"
     title="Hire With"
@@ -33,7 +30,6 @@ const EmployeeBackgroundCheck = () => {
       { label: "All Use Cases", href: "/use-cases" },
     ]}
   />
-  );
-};
+);
 
 export default EmployeeBackgroundCheck;

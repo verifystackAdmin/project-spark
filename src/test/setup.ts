@@ -1,5 +1,4 @@
-// @ts-ignore - jest-dom types may not be installed
-import "@testing-library/jest-dom";
+import "@testing-library/jest-dom/vitest";
 
 Object.defineProperty(window, "matchMedia", {
   writable: true,

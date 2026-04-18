@@ -1,9 +1,7 @@
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import usePageMeta from "@/hooks/usePageMeta";
 
 const Refund = () => {
-  usePageMeta({ title: "Refund Policy – VerifyStack", description: "VerifyStack refund policy. Learn about eligibility, timelines, and how to request a refund for verification services." });
   return (
     <div className="min-h-screen bg-background">
       <Header />

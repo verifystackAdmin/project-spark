@@ -11,14 +11,16 @@ const buttonVariants = cva(
       variant: {
         default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md hover:shadow-lg hover:-translate-y-0.5",
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-md",
-        outline: "border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground",
+        outline:
+          "border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground shadow-sm",
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
+        ghost: "text-foreground hover:bg-muted hover:text-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        hero: "bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-lg hover:shadow-glow hover:-translate-y-1 hover:scale-[1.02]",
-        heroOutline: "border-2 border-primary-foreground/30 bg-primary-foreground/10 text-primary-foreground backdrop-blur-sm hover:bg-primary-foreground/20 hover:border-primary-foreground/50",
+        hero: "bg-gradient-to-r from-primary to-accent text-white shadow-md [text-shadow:0_1px_1px_hsl(0_0%_0%/0.18)] hover:shadow-glow hover:-translate-y-1 hover:scale-[1.02]",
+        heroOutline:
+          "border-2 border-primary/55 bg-background text-foreground shadow-sm hover:bg-primary hover:text-primary-foreground hover:border-primary",
         teal: "bg-accent text-accent-foreground hover:bg-accent/90 shadow-md hover:shadow-teal-glow",
-        trust: "bg-trust text-primary-foreground hover:bg-trust/90 shadow-md",
+        trust: "bg-trust text-white hover:bg-trust/90 shadow-md",
       },
       size: {
         default: "h-11 px-6 py-2",

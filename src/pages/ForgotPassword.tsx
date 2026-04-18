@@ -30,7 +30,7 @@ const ForgotPassword = () => {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="flex min-h-dvh min-w-0 items-center justify-center overflow-x-hidden bg-background p-4">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -58,7 +58,7 @@ const ForgotPassword = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="flex min-h-dvh min-w-0 items-center justify-center overflow-x-hidden bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Forgot Password</CardTitle>

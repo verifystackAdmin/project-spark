@@ -1,12 +1,12 @@
 import Header from "@/components/layout/Header";
-import usePageMeta from "@/hooks/usePageMeta";
 import Footer from "@/components/layout/Footer";
 import { LiveDemo } from "@/components/landing/LiveDemo";
 import ScrollReveal from "@/components/ScrollReveal";
-import { Shield, CheckCircle, Lock, Brain } from "lucide-react";
+import { CheckCircle, Lock, Brain } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { CALENDLY_BOOK_DEMO_URL } from "@/lib/siteLinks";
 
 const Demo = () => {
-  usePageMeta({ title: "Live Demo – Try VerifyStack AI Verification", description: "Try VerifyStack's AI-powered background verification demo. See real-time document analysis, identity checks, and trust scoring in action." });
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -21,8 +21,16 @@ const Demo = () => {
               <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
                 See VerifyStack <span className="gradient-text">In Action</span>
               </h1>
-              <p className="max-w-2xl mx-auto text-lg text-muted-foreground mb-8">
+              <p className="max-w-2xl mx-auto text-lg text-muted-foreground mb-4">
                 Experience enterprise-grade AI-powered verification firsthand. Enter any email or social media handle to see a sample trust report.
+              </p>
+              <p className="text-sm text-muted-foreground mb-8">
+                Prefer a live conversation?{" "}
+                <Button variant="link" className="h-auto p-0 text-primary" asChild>
+                  <a href={CALENDLY_BOOK_DEMO_URL} target="_blank" rel="noopener noreferrer">
+                    Book a 30-minute call
+                  </a>
+                </Button>
               </p>
               <div className="flex flex-wrap items-center justify-center gap-4">
                 {[

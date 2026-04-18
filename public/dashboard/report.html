@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>VerifyStack report</title>
+    <!--
+      Keep in sync with api-gateway static copy (e.g. api-gateway/src/main/resources/static/dashboard/report.html).
+      Opens the gateway HTML report — same layout family as the PDF (dynamic rows come from report-generator /view).
+    -->
+    <style>
+      body {
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+        background: #0f172a;
+        color: #e2e8f0;
+        line-height: 1.5;
+      }
+      main {
+        max-width: 28rem;
+      }
+      h1 {
+        font-size: 1.125rem;
+        margin: 0 0 0.75rem;
+      }
+      p {
+        margin: 0;
+        font-size: 0.875rem;
+        color: #94a3b8;
+      }
+      code {
+        font-size: 0.8em;
+        padding: 0.1em 0.35em;
+        border-radius: 0.25rem;
+        background: #1e293b;
+      }
+    </style>
+  </head>
+  <body>
+    <main id="root"></main>
+    <script>
+      (function () {
+        var params = new URLSearchParams(window.location.search);
+        var id = (params.get("reportId") || params.get("id") || "").trim();
+        var root = document.getElementById("root");
+        if (!id) {
+          root.innerHTML =
+            "<h1>No report in this link</h1>" +
+            "<p>Add <code>?reportId=…</code> to the URL. If you scanned a <strong>QR on the PDF</strong>, try again from the latest PDF — the opened page matches that template (including dynamic verification rows generated when you run <code>/view</code>).</p>";
+          return;
+        }
+        var path = "/api/v1/reports/" + encodeURIComponent(id) + "/view";
+        window.location.replace(path);
+      })();
+    </script>
+  </body>
+</html>

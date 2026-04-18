@@ -1,10 +1,7 @@
 import UseCasePageLayout from "@/components/UseCasePageLayout";
-import usePageMeta from "@/hooks/usePageMeta";
 import { Building } from "lucide-react";
 
-const TenantScreening = () => {
-  usePageMeta({ title: "Tenant Screening – Verify Tenants Before Renting", description: "AI-powered tenant screening: identity verification, employment checks, rental history, and criminal record screening. Get trust scores in minutes." });
-  return (
+const TenantScreening = () => (
   <UseCasePageLayout
     badge="Tenant Verification"
     title="Screen Tenants"
@@ -27,13 +24,12 @@ const TenantScreening = () => {
       { step: "3", title: "Get Report", description: "Receive a detailed trust score and verification report in minutes." },
     ]}
     relatedPages={[
-      { label: "Domestic Worker Verification", href: "/use-cases/domestic-worker-verification" },
+      { label: "Domestic Worker Verification", href: "/solutions/domestic-worker-verification" },
       { label: "Employee Background Check", href: "/use-cases/employee-background-check" },
       { label: "Housing Society Screening", href: "/use-cases/housing-society-screening" },
       { label: "All Use Cases", href: "/use-cases" },
     ]}
   />
-  );
-};
+);
 
 export default TenantScreening;

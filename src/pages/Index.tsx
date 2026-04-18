@@ -1,12 +1,12 @@
 import { Link } from "react-router-dom";
-import usePageMeta from "@/hooks/usePageMeta";
+import { CALENDLY_BOOK_DEMO_URL } from "@/lib/siteLinks";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import HowItWorks from "@/components/HowItWorks";
-import TestimonialCarousel from "@/components/TestimonialCarousel";
 import AIParticleBackground from "@/components/AIParticleBackground";
+import HeroBackground from "@/components/layout/HeroBackground";
 import ScrollReveal from "@/components/ScrollReveal";
 import WhoIsItFor from "@/components/sections/WhoIsItFor";
 import AgencyFocus from "@/components/sections/AgencyFocus";
@@ -17,122 +17,161 @@ import IndividualsCTA from "@/components/sections/IndividualsCTA";
 import AIDashboardPreview from "@/components/sections/AIDashboardPreview";
 import SampleReport from "@/components/sections/SampleReport";
 import LandingPricing from "@/components/sections/LandingPricing";
+import TrustStack from "@/components/sections/TrustStack";
+import HomeFAQ from "@/components/sections/HomeFAQ";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Shield, Sparkles, ArrowRight } from "lucide-react";
+import { Shield, Sparkles, ArrowRight, Lock, ShieldCheck } from "lucide-react";
+import AIScanAnimation from "@/components/AIScanAnimation";
 
 const Index = () => {
   const isMobile = useIsMobile();
-  usePageMeta({ title: "VerifyStack – AI Background Verification for India", description: "Enterprise-grade AI-powered background verification for businesses, agencies, housing societies & individuals. Identity checks, criminal records, tenant screening & more." });
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh min-w-0 bg-background">
       <Header />
 
-      {/* Hero Section */}
-      <section className="relative pt-32 pb-24 md:pt-40 md:pb-32 overflow-hidden">
-        <div className="absolute inset-0 neural-grid opacity-30" />
+      {/* Hero Section — Deep Obsidian Dark (padding tuned to fixed h-16 header) */}
+      <section className="relative pt-24 pb-14 md:pt-28 md:pb-20 overflow-hidden" style={{ background: "var(--gradient-hero)" }}>
+        <HeroBackground />
         <div className="absolute inset-0">
           <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-float" />
           <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent/5 rounded-full blur-3xl animate-float-slow" />
         </div>
         <AIParticleBackground />
 
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-4xl mx-auto text-center">
+        <div className="container mx-auto max-w-7xl px-4 relative z-10">
+          <div className="grid md:grid-cols-2 gap-8 lg:gap-10 items-start">
+            {/* Left — Copy */}
+            <div className="text-center md:text-left md:pt-1">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5 }}
+                className="inline-flex items-center gap-2 px-4 py-1.5 glass-card rounded-full text-primary text-xs font-medium mb-5 border border-primary/20"
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                <span className="font-mono uppercase tracking-widest">Trust Infrastructure</span>
+              </motion.div>
+
+              <motion.h1
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.15 }}
+                className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-foreground leading-[1.05] mb-4 tracking-tight"
+              >
+                AI-Powered Trust &amp;{" "}
+                <br />
+                <span className="gradient-text">Verification Infrastructure</span>
+              </motion.h1>
+
+              <motion.p
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.25 }}
+                className="text-base font-semibold text-foreground/90 mb-2"
+              >
+                Verify anyone before trusting them.
+              </motion.p>
+
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.35 }}
+                className="text-base md:text-lg text-foreground/80 leading-relaxed mb-7 max-w-xl"
+              >
+                AI-powered identity authentication, background verification and risk screening — all in one platform. Build secure onboarding workflows in minutes.
+              </motion.p>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.48 }}
+                className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start"
+              >
+                <Link to="/run-check">
+                  <Button size="lg" className="w-full sm:w-auto group btn-glow">
+                    Verify Someone Now
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
+                <Button variant="outline" size="lg" className="w-full sm:w-auto hover-lift border-border/50" asChild>
+                  <a href={CALENDLY_BOOK_DEMO_URL} target="_blank" rel="noopener noreferrer">
+                    Request Demo
+                  </a>
+                </Button>
+              </motion.div>
+
+              {/* Trust Badges — immediately below CTAs */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.8, delay: 0.7 }}
+                className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 justify-center md:justify-start"
+              >
+                {[
+                  { icon: ShieldCheck, text: "DPDP 2023 Compliant" },
+                  { icon: Lock, text: "AES-256 Encryption" },
+                  { icon: Shield, text: "SOC 2 Ready" },
+                ].map(({ icon: Icon, text }) => (
+                  <span
+                    key={text}
+                    className="inline-flex items-center gap-1.5 text-xs text-foreground/55 font-mono uppercase tracking-wider"
+                  >
+                    <Icon className="w-3 h-3" />
+                    {text}
+                  </span>
+                ))}
+              </motion.div>
+            </div>
+
+            {/* Right — AI Scan Animation */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
+              initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 glass-card rounded-full text-primary text-xs font-medium mb-8 border border-primary/20"
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className="hidden md:flex w-full items-start justify-center lg:justify-end"
             >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span className="font-mono uppercase tracking-widest">AI-Powered Verification</span>
+              <AIScanAnimation />
             </motion.div>
-
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.15 }}
-              className="text-5xl md:text-6xl lg:text-8xl font-extrabold text-foreground leading-[0.95] mb-6 tracking-tight"
-            >
-              Trust, Verified.{" "}
-              <br />
-              <span className="gradient-text">For Everyone.</span>
-            </motion.h1>
-
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="text-lg md:text-xl text-muted-foreground leading-relaxed mb-10 max-w-2xl mx-auto"
-            >
-              Enterprise-grade AI background verification for businesses, agencies,
-              housing societies, and individuals.
-            </motion.p>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.45 }}
-              className="flex flex-col sm:flex-row gap-3 justify-center"
-            >
-              <Link to="/demo">
-                <Button size="lg" className="w-full sm:w-auto group btn-glow">
-                  Request Demo
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
-              <Link to="/run-check">
-                <Button variant="outline" size="lg" className="w-full sm:w-auto hover-lift border-border/50">
-                  Verify Someone Now
-                </Button>
-              </Link>
-            </motion.div>
-
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.7 }}
-              className="mt-8 text-xs text-muted-foreground font-mono uppercase tracking-widest"
-            >
-              Building the Trust Infrastructure for India
-            </motion.p>
           </div>
         </div>
 
-        {/* Bottom fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
+        {/* Bottom fade into next section */}
+        <div className="absolute bottom-0 left-0 right-0 h-20 md:h-24 bg-gradient-to-t from-background to-transparent pointer-events-none" />
       </section>
 
-      {/* 2 — Who It's For */}
+      {/* 2 — Trust & Safety Stack (FOLD 2) */}
+      <TrustStack />
+
+      {/* 3 — Who It's For */}
       <WhoIsItFor />
 
-      {/* 3 — How It Works */}
+      {/* 4 — How It Works */}
       <HowItWorks />
 
-      {/* 4 — AI Dashboard Preview */}
+      {/* 5 — AI Dashboard Preview */}
       <AIDashboardPreview />
 
-      {/* 5 — Agency Focus */}
+      {/* 6 — Agency Focus */}
       <AgencyFocus />
 
-      {/* 6 — Housing Societies */}
+      {/* 7 — Housing Societies */}
       <HousingSocieties />
 
-      {/* 7 — Why Trust VerifyStack */}
+      {/* 8 — Why Trust VerifyStack */}
       <WhyTrustUs />
 
-      {/* 8 — Sample Report */}
+      {/* 9 — Sample Report */}
       <SampleReport />
 
-      {/* 9 — Category Vision */}
+      {/* Category Vision */}
       <CategoryVision />
-
-      {/* Testimonials */}
-      <TestimonialCarousel />
 
       {/* 10 — Pricing */}
       <LandingPricing />
+
+      {/* 11 — FAQs */}
+      <HomeFAQ />
 
       {/* CTA for Individuals */}
       <IndividualsCTA />

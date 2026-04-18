@@ -2,69 +2,171 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>VerifyStack - Know Who You&#39;re Trusting</title>
-    <meta name="description" content="Know who you&#39;re trusting — before it&#39;s too late. AI-powered verification for relationships, identity, documents, and background checks.">
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+
+    <title>VerifyStack | Automated Background Verification &amp; KYC Platform</title>
+    <meta name="description" content="Automated background KYC and identity verification platform. Verify employees, renters, and vendors in seconds to secure your business and reduce compliance risk." />
     <meta name="author" content="VerifyStack" />
     <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://verifystack.in" />
 
+    <!-- Favicon: VerifyStack shield mark only. ?v= matches FAVICON_VERSION in src/lib/seoConfig.ts -->
+    <link rel="icon" href="/favicon.ico?v=9" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=9" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=9" />
+    <link rel="icon" href="/favicon.svg?v=9" type="image/svg+xml" sizes="any" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/logo-192.png?v=9" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=9" sizes="180x180" />
+    <link rel="shortcut icon" href="/favicon.ico?v=9" />
+    <link rel="manifest" href="/site.webmanifest?v=9" />
+
+    <!-- Open Graph -->
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/3e8064e6-36a6-4884-8242-adba6f3a1ee3/id-preview-691ff62b--671fd9c4-0e93-4c4f-8865-99d8f896b920.lovable.app-1771583371747.png">
+    <meta property="og:site_name" content="VerifyStack" />
+    <meta property="og:url" content="https://verifystack.in" />
+    <meta property="og:title" content="VerifyStack | Automated Background Verification &amp; KYC Platform" />
+    <meta property="og:description" content="Automated background KYC and identity verification platform. Verify employees, renters, and vendors in seconds to secure your business and reduce compliance risk." />
+    <meta property="og:image" content="https://verifystack.in/og-image.png?v=4" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="VerifyStack — Automated background verification" />
 
+    <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@VerifyStack" />
-    <meta name="twitter:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/3e8064e6-36a6-4884-8242-adba6f3a1ee3/id-preview-691ff62b--671fd9c4-0e93-4c4f-8865-99d8f896b920.lovable.app-1771583371747.png">
+    <meta name="twitter:title" content="VerifyStack | Automated Background Verification &amp; KYC Platform" />
+    <meta name="twitter:description" content="Automated background KYC and identity verification platform. Verify employees, renters, and vendors in seconds to secure your business and reduce compliance risk." />
+    <meta name="twitter:image" content="https://verifystack.in/og-image.png?v=4" />
 
-    <link rel="canonical" href="https://verifystack.in" />
-    <meta property="og:title" content="VerifyStack - Know Who You&#39;re Trusting">
-  <meta name="twitter:title" content="VerifyStack - Know Who You&#39;re Trusting">
-  <meta property="og:description" content="Know who you&#39;re trusting — before it&#39;s too late. AI-powered verification for relationships, identity, documents, and background checks.">
-  <meta name="twitter:description" content="Know who you&#39;re trusting — before it&#39;s too late. AI-powered verification for relationships, identity, documents, and background checks.">
-
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "VerifyStack",
-    "url": "https://verifystack.in",
-    "logo": "https://verifystack.in/assets/verifystack-logo.png",
-    "description": "Enterprise-grade AI-powered background verification, identity verification, document verification, tenant verification, and criminal record checks for businesses, agencies, housing societies, and individuals in India.",
-    "sameAs": [
-      "https://www.linkedin.com/company/verifystack",
-      "https://twitter.com/VerifyStack",
-      "https://www.facebook.com/VerifyStack",
-      "https://www.instagram.com/VerifyStack"
-    ],
-    "contactPoint": {
-      "@type": "ContactPoint",
-      "email": "support@verifystack.in",
-      "contactType": "customer support",
-      "areaServed": "IN"
-    },
-    "foundingDate": "2024",
-    "address": {
-      "@type": "PostalAddress",
-      "addressLocality": "Pune",
-      "addressCountry": "IN"
+    <!-- JSON-LD: must match visible FAQ copy in HomeFAQ.tsx; FAQPage is eligible in Rich Results Test -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://verifystack.in/#organization",
+          "name": "VerifyStack",
+          "url": "https://verifystack.in",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://verifystack.in/logo-192.png?v=9"
+          },
+          "sameAs": [
+            "https://www.linkedin.com/company/verifystack/",
+            "https://www.instagram.com/verify.stack/"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://verifystack.in/#website",
+          "name": "VerifyStack",
+          "url": "https://verifystack.in",
+          "publisher": { "@id": "https://verifystack.in/#organization" }
+        },
+        {
+          "@type": "FAQPage",
+          "@id": "https://verifystack.in/#faq",
+          "url": "https://verifystack.in",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "What is background verification and why is it important?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Background verification is the process of checking a person's identity, criminal records, address and other credentials before hiring, renting or trusting them. It helps businesses, families and organizations reduce fraud and make safer decisions."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How does VerifyStack background verification work?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "VerifyStack uses AI to analyze identity documents, criminal records, address data and digital signals. Once processed, the platform generates a Trust Score and a detailed report so you can assess risk quickly."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Who can use VerifyStack for background checks?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "VerifyStack is built for businesses, agencies, housing societies and individuals. Companies verify employees, families verify tenants or domestic help, and agencies pre-verify their workforce before onboarding."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What types of background checks can VerifyStack perform?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "VerifyStack covers identity verification, employee background checks, tenant screening, domestic help verification, criminal record checks, address verification and workforce screening."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How long does background verification take?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Most verifications are completed within minutes depending on the documents and data sources available. VerifyStack's AI-powered system analyzes multiple data points quickly to generate a risk score and verification report."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Is VerifyStack compliant with Indian data protection laws?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes. VerifyStack is designed with compliance in mind and follows India's DPDP Act requirements along with strong security practices such as AES-256 encryption and secure data infrastructure."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Can individuals use VerifyStack to verify tenant or domestic help?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes. Families can use VerifyStack to verify tenants, drivers, nannies and domestic help before allowing them into their home or renting out their property."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What is a Trust Score in VerifyStack?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "The Trust Score is an AI-generated score from 0 to 100 that summarizes identity verification, criminal checks, address verification and other risk signals. A higher score means lower risk."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Can businesses verify employees using VerifyStack?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes. Businesses can use VerifyStack to check identity details, employment history, criminal records and other risk factors before onboarding a new hire."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Is background verification secure on VerifyStack?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "VerifyStack uses end-to-end encryption, secure infrastructure and strict data protection protocols to keep all verification data and reports confidential."
+              }
+            }
+          ]
+        }
+      ]
     }
-  }
-  </script>
+    </script>
 
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "VerifyStack",
-    "url": "https://verifystack.in",
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": "https://verifystack.in/search?q={search_term_string}",
-      "query-input": "required name=search_term_string"
-    }
-  }
-  </script>
-</head>
-
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HH72P69WY7"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-HH72P69WY7');
+    </script>
+  </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>

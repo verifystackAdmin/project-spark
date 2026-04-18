@@ -1,4 +1,4 @@
-import { Check, Sparkles } from "lucide-react";
+import { Check, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
@@ -11,6 +11,11 @@ interface PricingCardProps {
   features: string[];
   popular?: boolean;
   buttonText?: string;
+  /** When set with `onCtaClick`, renders a button instead of linking to signup. */
+  onCtaClick?: () => void | Promise<void>;
+  ctaLoading?: boolean;
+  /** Link target when `onCtaClick` is not used. Default `/signup`. */
+  ctaHref?: string;
 }
 
 const PricingCard = ({
@@ -21,6 +26,9 @@ const PricingCard = ({
   features,
   popular = false,
   buttonText = "Get Started",
+  onCtaClick,
+  ctaLoading = false,
+  ctaHref = "/signup",
 }: PricingCardProps) => {
   return (
     <div
@@ -65,16 +73,32 @@ const PricingCard = ({
         ))}
       </ul>
 
-      {/* CTA Button */}
-      <Link to="/signup">
+      {/* CTA */}
+      {onCtaClick ? (
         <Button
+          type="button"
           variant={popular ? "hero" : "default"}
           className="w-full"
           size="lg"
+          disabled={ctaLoading}
+          onClick={() => void onCtaClick()}
         >
-          {buttonText}
+          {ctaLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin inline" />
+              {buttonText}
+            </>
+          ) : (
+            buttonText
+          )}
         </Button>
-      </Link>
+      ) : (
+        <Link to={ctaHref}>
+          <Button variant={popular ? "hero" : "default"} className="w-full" size="lg">
+            {buttonText}
+          </Button>
+        </Link>
+      )}
     </div>
   );
 };

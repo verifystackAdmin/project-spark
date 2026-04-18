@@ -1,341 +1,463 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import TrustScoreGauge from "@/components/TrustScoreGauge";
-import VerificationResultCard from "@/components/VerificationResultCard";
+import { ActionCenter } from "@/components/dashboard/intelligence/ActionCenter";
+import { ActivityHeatStrip } from "@/components/dashboard/intelligence/ActivityHeatStrip";
+import { DashboardDropZone } from "@/components/dashboard/intelligence/DashboardDropZone";
+import { IntelligenceFeed } from "@/components/dashboard/intelligence/IntelligenceFeed";
+import { MetricInsightCard } from "@/components/dashboard/intelligence/MetricInsightCard";
+import { MiniNetworkGraph } from "@/components/dashboard/intelligence/MiniNetworkGraph";
+import { PipelineStatusPill } from "@/components/dashboard/intelligence/PipelineStatusPill";
+import { GeometricAvatar } from "@/components/dashboard/intelligence/GeometricAvatar";
+import { ReportCategoryStrip } from "@/components/dashboard/intelligence/ReportCategoryStrip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useAuth } from "@/contexts/AuthContext";
+import { useBgvReports } from "@/hooks/useBgvReports";
+import {
+  buildIntelligenceSignals,
+  dailyActivitySeries,
+  dailyTrustAverageSeries,
+  monthOverMonthChecks,
+  trendVersusPrior30Days,
+  trustScoreConfidence,
+  weekHeatLevels,
+} from "@/lib/dashboardIntelligence";
+import {
+  buildActionCenterItems,
+  categoryMicroLine,
+  computeScoreTrend,
+  deriveCategoryInsights,
+  explainTrustWhy,
+  formatExactDateTime,
+  formatRelativeTime,
+} from "@/lib/dashboardNarrative";
+import {
+  bgvReportRowStatus,
+  overallStatusToScore,
+  bgvReportDownloadHref,
+  bgvReportHtmlViewHref,
+} from "@/lib/bgvGatewayApi";
 import {
   Shield,
   Plus,
   FileText,
-  User,
-  Settings,
-  LogOut,
-  Bell,
   Search,
   CreditCard,
   Clock,
   Download,
-  UserCheck,
-  FileSearch,
-  Phone,
-  Globe,
-  AlertTriangle,
-  Heart,
+  Eye,
+  ArrowRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
-const sidebarItems = [
-  { icon: Shield, label: "Dashboard", href: "/dashboard", active: true },
-  { icon: Plus, label: "New Check", href: "/run-check" },
-  { icon: FileText, label: "Reports", href: "/dashboard/reports" },
-  { icon: CreditCard, label: "Payments", href: "/dashboard/payments" },
-  { icon: User, label: "Profile", href: "/dashboard/profile" },
-  { icon: Settings, label: "Settings", href: "/dashboard/settings" },
-];
-
-const recentReports = [
-  {
-    id: 1,
-    name: "Rahul Sharma",
-    type: "Identity + Social",
-    score: 87,
-    date: "Dec 10, 2024",
-    status: "completed",
-  },
-  {
-    id: 2,
-    name: "Priya Patel",
-    type: "Full Verification",
-    score: 92,
-    date: "Dec 9, 2024",
-    status: "completed",
-  },
-  {
-    id: 3,
-    name: "Amit Kumar",
-    type: "Relationship Analysis",
-    score: 65,
-    date: "Dec 8, 2024",
-    status: "completed",
-  },
-  {
-    id: 4,
-    name: "New Check",
-    type: "Identity",
-    score: 0,
-    date: "In Progress",
-    status: "pending",
-  },
-];
+type DashboardLocationState = {
+  bgvSubmitted?: boolean;
+  reportId?: string;
+};
 
 const Dashboard = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const { user, logout, logoutAll } = useAuth();
-  const documentsUploaded = localStorage.getItem('documentsUploaded') === 'true';
+  const { user } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const bgvToastShown = useRef(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const { reports, totalElements, loading: reportsLoading, error: reportsError } = useBgvReports(
+    user?.email,
+    { page: 0, pageSize: 100 },
+  );
 
-  const dynamicSidebarItems = [
-    { icon: Shield, label: "Dashboard", href: "/dashboard", active: true },
-    { icon: Plus, label: "New Check", href: "/run-check" },
-    { icon: FileText, label: "Reports", href: "/dashboard/reports" },
-    { icon: CreditCard, label: "Payments", href: "/dashboard/payments" },
-    { icon: User, label: "Profile", href: "/dashboard/profile" },
-    { icon: Settings, label: "Settings", href: "/dashboard/settings" },
-  ];
+  const filteredReports = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return reports;
+    return reports.filter((r) => {
+      const name = (r.subjectFullName ?? "").toLowerCase();
+      const id = (r.reportId ?? "").toLowerCase();
+      return name.includes(q) || id.includes(q);
+    });
+  }, [reports, searchQuery]);
+
+  const intelSignals = useMemo(() => buildIntelligenceSignals(reports, 8), [reports]);
+  const activitySpark = useMemo(() => dailyActivitySeries(reports), [reports]);
+  const trustSpark = useMemo(() => dailyTrustAverageSeries(reports), [reports]);
+  const heatLevels = useMemo(() => weekHeatLevels(reports), [reports]);
+  const trend30 = useMemo(() => trendVersusPrior30Days(reports), [reports]);
+  const mom = useMemo(() => monthOverMonthChecks(reports), [reports]);
+
+  useEffect(() => {
+    const st = location.state as DashboardLocationState | null;
+    if (!st?.bgvSubmitted || !st?.reportId) {
+      bgvToastShown.current = false;
+      return;
+    }
+    if (bgvToastShown.current) return;
+    bgvToastShown.current = true;
+    toast({
+      title: "BGV report submitted",
+      description: (
+        <span className="block pt-1">
+          <span className="text-muted-foreground">Report ID</span>{" "}
+          <code className="rounded bg-muted px-1.5 py-0.5 text-xs font-mono">{st.reportId}</code>
+        </span>
+      ),
+    });
+    navigate(location.pathname, { replace: true, state: {} });
+  }, [location.pathname, location.state, navigate, toast]);
+
+  const stats = useMemo(() => {
+    const now = new Date();
+    const ym = `${now.getFullYear()}-${now.getMonth()}`;
+    const thisMonth = reports.filter((r) => {
+      if (!r.generatedAt) return false;
+      const d = new Date(r.generatedAt);
+      return `${d.getFullYear()}-${d.getMonth()}` === ym;
+    }).length;
+    const scores = reports
+      .map((r) => overallStatusToScore(r.overallStatus))
+      .filter((n): n is number => n != null);
+    const avg =
+      scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : null;
+    return {
+      total: totalElements > 0 ? totalElements : reports.length,
+      thisMonth,
+      avg,
+    };
+  }, [reports, totalElements]);
+
+  const recentSlice = useMemo(() => filteredReports.slice(0, 5), [filteredReports]);
+
+  const latestCompleted = useMemo(() => {
+    for (const r of reports) {
+      if (bgvReportRowStatus(r) === "completed" && r.overallStatus) return r;
+    }
+    return reports[0] ?? null;
+  }, [reports]);
+
+  const latestGaugeScore = overallStatusToScore(latestCompleted?.overallStatus) ?? 0;
+  const confidence = trustScoreConfidence(latestCompleted, latestGaugeScore);
+  const netEmphasis =
+    latestGaugeScore >= 80 ? "high" : latestGaugeScore > 0 && latestGaugeScore < 60 ? "low" : "medium";
+
+  const trustWhy = explainTrustWhy(latestCompleted, latestGaugeScore);
+  const scoreTrend = computeScoreTrend(reports, latestCompleted);
+
+  const actionItems = useMemo(
+    () => buildActionCenterItems(reports, (id) => bgvReportHtmlViewHref(id)),
+    [reports],
+  );
+
+  const pipelinesOk = !reportsError;
 
   return (
-    <div className="min-h-screen bg-background flex">
-      {/* Sidebar */}
-      <aside
-        className={cn(
-          "fixed left-0 top-0 h-full bg-card border-r border-border/50 z-40 transition-all duration-300",
-          sidebarOpen ? "w-64" : "w-20"
-        )}
-      >
-        {/* Logo */}
-        <div className="h-20 flex items-center px-6 border-b border-border/50">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center flex-shrink-0">
-              <Shield className="w-5 h-5 text-primary-foreground" />
-            </div>
-            {sidebarOpen && (
-              <span className="text-lg font-bold text-foreground">
-                Verify<span className="text-primary">Me</span>
-              </span>
-            )}
-          </Link>
+    <DashboardLayout
+      title="Dashboard"
+      showFooter={false}
+      contentClassName="relative isolate z-0 min-w-0 w-full max-w-[1600px] px-3 py-4 sm:px-6 sm:py-6"
+      headerLeading={
+        <div className="relative w-full min-w-0 md:max-w-lg">
+          <Search
+            className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground sm:h-5 sm:w-5"
+            aria-hidden
+          />
+          <Input
+            type="search"
+            placeholder="Search by name or report ID…"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="h-10 w-full min-w-0 rounded-xl border-border/60 bg-muted/80 pl-9 pr-3 text-sm shadow-sm transition-colors focus-visible:bg-background sm:h-11 sm:pl-10"
+            aria-label="Search reports by subject name or report ID"
+          />
         </div>
+      }
+      headerTrailing={<PipelineStatusPill connected={pipelinesOk} />}
+    >
+      {/* Ambient mesh (scoped to this page, not fixed — avoids stacking glitches) */}
+      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden>
+        <div className="animate-dashboard-mesh absolute -left-1/4 top-0 h-[60vh] w-[70vw] rounded-full bg-gradient-to-br from-primary/15 via-transparent to-accent/10 blur-3xl" />
+        <div className="absolute bottom-0 right-0 h-[50vh] w-[55vw] rounded-full bg-gradient-to-tl from-[hsl(var(--electric-purple)/0.12)] to-transparent blur-3xl" />
+      </div>
 
-        {/* Navigation */}
-        <nav className="p-4 space-y-2">
-          {dynamicSidebarItems.map((item, index) => (
-            <Link
-              key={index}
-              to={item.href}
-              className={cn(
-                "flex items-center gap-3 px-4 py-3 rounded-xl transition-all",
-                item.active
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
-              )}
-            >
-              <item.icon className="w-5 h-5 flex-shrink-0" />
-              {sidebarOpen && (
-                <span className="font-medium">{item.label}</span>
-              )}
-            </Link>
-          ))}
-        </nav>
-
-        {/* Logout */}
-        <div className="absolute bottom-4 left-4 right-4">
-          <button 
-            onClick={logout}
-            className="flex items-center gap-3 px-4 py-3 rounded-xl text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all w-full"
-          >
-            <LogOut className="w-5 h-5 flex-shrink-0" />
-            {sidebarOpen && <span className="font-medium">Logout</span>}
-          </button>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main
-        className={cn(
-          "flex-1 transition-all duration-300",
-          sidebarOpen ? "ml-64" : "ml-20"
-        )}
-      >
-        {/* Header */}
-        <header className="h-20 bg-card border-b border-border/50 px-6 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 rounded-lg hover:bg-muted transition-colors"
-            >
-              <svg
-                className="w-6 h-6 text-muted-foreground"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
-            </button>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-              <input
-                type="text"
-                placeholder="Search reports..."
-                className="pl-10 pr-4 py-2 bg-muted rounded-xl border-none focus:ring-2 focus:ring-primary w-64"
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <button className="relative p-2 rounded-lg hover:bg-muted transition-colors">
-              <Bell className="w-5 h-5 text-muted-foreground" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full" />
-            </button>
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground font-semibold">
-              {getInitials(user?.name, user?.email)}
-            </div>
-          </div>
-        </header>
-
-        {/* Dashboard Content */}
-        <div className="p-6">
-          {/* Welcome Section */}
-          <div className="mb-8">
-            <h1 className="text-2xl font-bold text-foreground mb-2">
-              Welcome back, {user?.name || user?.email || 'User'}!
-            </h1>
-            <p className="text-muted-foreground">
-              Here's an overview of your verification activity.
+      <div className="relative z-10 mx-auto max-w-6xl">
+        {/* Hero + quick drop */}
+        <div className="mb-8 grid gap-4 lg:grid-cols-[1fr_minmax(260px,340px)] lg:items-stretch lg:gap-6">
+          <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-card/90 via-card/80 to-primary/10 p-4 shadow-lg shadow-primary/5 backdrop-blur-xl sm:p-6">
+            <div
+              className="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full bg-primary/20 blur-3xl animate-dashboard-mesh"
+              aria-hidden
+            />
+            <p className="relative mb-1 text-xs font-semibold uppercase tracking-wider text-primary/90">
+              Trust intelligence
             </p>
+            <h1 className="relative text-balance text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+              Welcome back, {user?.name || user?.email?.split("@")[0] || "there"}
+            </h1>
+            <p className="relative mt-2 max-w-xl text-pretty text-sm leading-relaxed text-muted-foreground sm:text-base">
+              Live signals, document graph, and confidence-aware scoring — your command center for background
+              verification.
+            </p>
+            {reportsError && (
+              <p className="relative mt-3 text-sm text-amber-600 dark:text-amber-500">
+                Could not load live reports ({reportsError}). Try refreshing or check your connection.
+              </p>
+            )}
           </div>
+          <DashboardDropZone className="relative z-[1] lg:min-h-[160px]" />
+        </div>
 
-          {/* Stats Grid */}
-          <div className="grid md:grid-cols-4 gap-6 mb-8">
-            {[
-              { label: "Total Checks", value: "47", icon: FileText, color: "text-primary" },
-              { label: "This Month", value: "12", icon: Clock, color: "text-accent" },
-              { label: "Avg. Trust Score", value: "84", icon: Shield, color: "text-trust" },
-              { label: "Credits Left", value: "38", icon: CreditCard, color: "text-warning" },
-            ].map((stat, index) => (
-              <div
-                key={index}
-                className="bg-card rounded-2xl border border-border/50 p-6"
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <div className={cn("w-12 h-12 rounded-xl bg-muted flex items-center justify-center", stat.color)}>
-                    <stat.icon className="w-6 h-6" />
-                  </div>
+        {/* Metrics — glass + sparklines + tooltips */}
+        <div className="mb-8 grid min-w-0 gap-3 sm:gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <MetricInsightCard
+            label="Total checks"
+            value={reportsLoading ? "…" : String(stats.total)}
+            icon={FileText}
+            iconClassName="text-primary"
+            sparklineValues={activitySpark}
+            sparkTone="primary"
+            tooltip={trend30.label}
+            glow={stats.total > 0}
+          />
+          <MetricInsightCard
+            label="This month"
+            value={reportsLoading ? "…" : String(stats.thisMonth)}
+            icon={Clock}
+            iconClassName="text-accent"
+            sparklineValues={activitySpark}
+            sparkTone="accent"
+            tooltip={mom.label}
+          />
+          <MetricInsightCard
+            label="Avg. trust score"
+            value={reportsLoading ? "…" : stats.avg != null ? String(stats.avg) : "—"}
+            icon={Shield}
+            iconClassName="text-[hsl(var(--trust-green))]"
+            sparklineValues={trustSpark.some((n) => n > 0) ? trustSpark : activitySpark}
+            sparkTone="trust"
+            tooltip={
+              stats.avg != null
+                ? `Rolling daily average from loaded reports. ${trend30.label}`
+                : "Complete checks to compute a trust average."
+            }
+            glow={stats.avg != null && stats.avg >= 80}
+          />
+          <MetricInsightCard
+            label="Credits left"
+            value="—"
+            icon={CreditCard}
+            iconClassName="text-[hsl(var(--warning-amber))]"
+            sparklineValues={activitySpark.map(() => 0)}
+            sparkTone="warning"
+            tooltip="Quota comes from your active plan — open Payments to manage billing."
+          />
+        </div>
+
+        {/* Asymmetric main: intelligence + list | trust snapshot */}
+        <div className="grid min-w-0 gap-6 xl:grid-cols-12 xl:items-start">
+          <div className="min-w-0 space-y-6 xl:col-span-7">
+            <div className="overflow-hidden rounded-2xl border border-white/10 bg-card/50 p-4 shadow-md backdrop-blur-md sm:p-5">
+              <IntelligenceFeed signals={intelSignals} />
+            </div>
+
+            <div className="min-w-0 overflow-hidden rounded-2xl border border-border/60 bg-card/80 p-4 shadow-sm ring-1 ring-border/40 backdrop-blur-sm sm:p-6">
+              <div className="mb-5 flex flex-col gap-4 border-b border-border/50 pb-4 sm:flex-row sm:items-end sm:justify-between">
+                <div className="min-w-0 space-y-1">
+                  <h2 className="text-lg font-semibold tracking-tight text-foreground sm:text-xl">Recent reports</h2>
+                  <p className="text-sm text-muted-foreground">
+                    {reportsLoading
+                      ? "Loading…"
+                      : searchQuery.trim()
+                        ? `${recentSlice.length} listed · ${filteredReports.length} match your search`
+                        : `Up to 5 most recent · ${stats.total} total in your account`}
+                  </p>
                 </div>
-                <p className="text-3xl font-bold text-foreground">{stat.value}</p>
-                <p className="text-sm text-muted-foreground">{stat.label}</p>
-              </div>
-            ))}
-          </div>
-
-          <div className="grid lg:grid-cols-3 gap-6">
-            {/* Recent Reports */}
-            <div className="lg:col-span-2 bg-card rounded-2xl border border-border/50 p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold text-foreground">
-                  Recent Reports
-                </h2>
-                <Link to="/run-check">
-                  <Button variant="default" size="sm">
-                    <Plus className="w-4 h-4" />
-                    New Check
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2">
+                  <Button variant="outline" size="sm" className="w-full sm:w-auto" asChild>
+                    <Link to="/dashboard/reports" className="inline-flex items-center gap-1">
+                      View all
+                      <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+                    </Link>
                   </Button>
-                </Link>
+                  <Link to="/run-check" className="shrink-0">
+                    <Button variant="default" size="sm" className="w-full sm:w-auto">
+                      <Plus className="h-4 w-4" />
+                      New check
+                    </Button>
+                  </Link>
+                </div>
               </div>
 
-              <div className="space-y-4">
-                {recentReports.map((report) => (
-                  <div
-                    key={report.id}
-                    className="flex items-center gap-4 p-4 rounded-xl bg-muted/50 hover:bg-muted transition-colors cursor-pointer"
-                  >
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center text-primary font-semibold">
-                      {report.name.split(" ").map((n) => n[0]).join("")}
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-foreground">
-                        {report.name}
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        {report.type} • {report.date}
-                      </p>
-                    </div>
-                    {report.status === "completed" ? (
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={cn(
-                            "text-sm font-semibold px-3 py-1 rounded-full",
-                            report.score >= 80
-                              ? "bg-trust/10 text-trust"
-                              : report.score >= 60
-                              ? "bg-accent/10 text-accent"
-                              : "bg-warning/10 text-warning"
-                          )}
-                        >
-                          Score: {report.score}
-                        </div>
-                        <Button variant="ghost" size="icon">
-                          <Download className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    ) : (
-                      <span className="text-sm text-muted-foreground animate-pulse">
-                        Processing...
-                      </span>
+              <div className="space-y-3 sm:space-y-4">
+                {reportsLoading && (
+                  <p className="py-10 text-center text-sm text-muted-foreground">Loading reports…</p>
+                )}
+                {!reportsLoading && recentSlice.length === 0 && (
+                  <div className="rounded-xl border border-dashed border-border/70 bg-muted/30 px-4 py-10 text-center">
+                    <p className="text-sm text-muted-foreground">
+                      {searchQuery.trim()
+                        ? "No reports match your search. Try another name or ID."
+                        : "No reports yet. Start your first verification to see trust scores here."}
+                    </p>
+                    {!searchQuery.trim() && (
+                      <Button className="mt-4" asChild>
+                        <Link to="/run-check">Run a check</Link>
+                      </Button>
                     )}
                   </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Latest Trust Score */}
-            <div className="bg-card rounded-2xl border border-border/50 p-6">
-              <h2 className="text-lg font-semibold text-foreground mb-6">
-                Latest Verification
-              </h2>
-              <div className="flex justify-center mb-6">
-                <TrustScoreGauge score={87} size="md" />
-              </div>
-              <div className="space-y-3">
-                <VerificationResultCard
-                  icon={UserCheck}
-                  title="Identity"
-                  description="Verified"
-                  status="verified"
-                />
-                <VerificationResultCard
-                  icon={FileSearch}
-                  title="Documents"
-                  description="Authentic"
-                  status="verified"
-                />
-                <VerificationResultCard
-                  icon={Phone}
-                  title="Phone"
-                  description="Credible"
-                  status="verified"
-                />
-                <VerificationResultCard
-                  icon={Globe}
-                  title="Social"
-                  description="Minor concerns"
-                  status="warning"
-                />
+                )}
+                {!reportsLoading &&
+                  recentSlice.map((report) => {
+                    const id = report.reportId ?? "";
+                    const name = report.subjectFullName || "Subject";
+                    const rowStatus = bgvReportRowStatus(report);
+                    const score = overallStatusToScore(report.overallStatus);
+                    const avatarSeed = `${id}|${name}`;
+                    const cats = deriveCategoryInsights(report, score, rowStatus);
+                    const story = categoryMicroLine(cats, score);
+                    return (
+                      <div
+                        key={id || name}
+                        className="group rounded-xl border border-transparent bg-muted/40 p-4 transition-all hover:border-primary/20 hover:bg-muted/60"
+                      >
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
+                          <GeometricAvatar seed={avatarSeed} photoUrl={report.subjectPhotoUrl} size={52} className="sm:mt-0.5" />
+                          <div className="min-w-0 flex-1 space-y-2">
+                            <div className="flex flex-wrap items-baseline justify-between gap-2">
+                              <h3 className="truncate text-base font-semibold text-foreground">{name}</h3>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <span className="shrink-0 cursor-default text-xs text-muted-foreground">
+                                    {formatRelativeTime(report.generatedAt)}
+                                  </span>
+                                </TooltipTrigger>
+                                <TooltipContent side="top" className="text-xs">
+                                  {formatExactDateTime(report.generatedAt)}
+                                </TooltipContent>
+                              </Tooltip>
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                              <span className="font-medium text-foreground/90">BGV</span>
+                              <span className="mx-1.5 text-border">·</span>
+                              <span>{report.overallStatus ?? report.status ?? "—"}</span>
+                            </p>
+                            <ReportCategoryStrip categories={cats} />
+                            <p className="text-xs leading-relaxed text-muted-foreground">{story}</p>
+                          </div>
+                          <div className="flex shrink-0 flex-col items-stretch gap-2 sm:items-end">
+                            {rowStatus === "completed" && score != null ? (
+                              <>
+                                <div
+                                  className={cn(
+                                    "self-end rounded-full px-3 py-1 font-mono text-sm font-semibold tabular-nums",
+                                    score >= 80
+                                      ? "bg-trust/10 text-trust"
+                                      : score >= 60
+                                        ? "bg-accent/10 text-accent"
+                                        : "bg-warning/10 text-warning",
+                                  )}
+                                >
+                                  {score}
+                                </div>
+                                {id ? (
+                                  <div className="flex justify-end gap-1">
+                                    <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                                      <a
+                                        href={bgvReportHtmlViewHref(id)}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        title="View report"
+                                      >
+                                        <Eye className="h-4 w-4" />
+                                      </a>
+                                    </Button>
+                                    <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                                      <a
+                                        href={bgvReportDownloadHref(id)}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        title="Download PDF"
+                                      >
+                                        <Download className="h-4 w-4" />
+                                      </a>
+                                    </Button>
+                                  </div>
+                                ) : null}
+                              </>
+                            ) : rowStatus === "failed" ? (
+                              <span className="text-sm text-destructive">Failed</span>
+                            ) : (
+                              <span className="animate-pulse text-sm text-muted-foreground">Processing…</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
               </div>
             </div>
           </div>
+
+          {/* Trust snapshot — wider, layered */}
+          <div
+            className={cn(
+              "min-w-0 space-y-5 xl:col-span-5",
+              "relative z-[2] rounded-2xl border border-white/10 bg-card/70 p-4 shadow-xl backdrop-blur-xl sm:p-6",
+              latestGaugeScore >= 85 && "animate-trust-glow",
+            )}
+          >
+            <div>
+              <h2 className="text-lg font-semibold tracking-tight text-foreground">Trust snapshot</h2>
+              <p className="mt-1 text-sm text-muted-foreground">Latest graph + score confidence</p>
+            </div>
+
+            <MiniNetworkGraph emphasis={netEmphasis} />
+
+            <div className="flex justify-center py-1">
+              <TrustScoreGauge
+                score={latestGaugeScore || 0}
+                size="md"
+                caption={trustWhy}
+                trendHint={scoreTrend.label || undefined}
+              />
+            </div>
+
+            <div className="space-y-2 px-1">
+              <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
+                <span>Model confidence</span>
+                <span className="font-mono tabular-nums text-foreground">{confidence.pct}%</span>
+              </div>
+              <div className="h-2 w-full overflow-hidden rounded-full bg-muted/80">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-primary via-accent to-[hsl(var(--trust-green))] transition-all duration-700"
+                  style={{ width: `${confidence.pct}%` }}
+                />
+              </div>
+              <p className="text-center text-xs leading-relaxed text-muted-foreground">{confidence.label}</p>
+            </div>
+
+            <ActivityHeatStrip levels={heatLevels} className="px-1" />
+
+            <p className="text-center text-sm text-muted-foreground">
+              {latestCompleted?.overallStatus ? (
+                <>
+                  Latest status:{" "}
+                  <span className="font-medium text-foreground">{latestCompleted.overallStatus}</span>
+                </>
+              ) : (
+                "Complete a check to see your trust score here."
+              )}
+            </p>
+
+            <div className="border-t border-border/50 pt-4">
+              <ActionCenter items={actionItems} />
+            </div>
+          </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 };
 
 export default Dashboard;
-const getInitials = (name?: string, email?: string) => {
-  if (name) {
-    const names = name.split(' ');
-    if (names.length > 1) {
-      return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
-    }
-    return name.substring(0, 2).toUpperCase();
-  }
-  if (email) {
-    return email.substring(0, 2).toUpperCase();
-  }
-  return 'U'; // User
-};

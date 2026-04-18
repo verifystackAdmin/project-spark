@@ -1,0 +1,14 @@
+# Legacy template JPEG URLs → current VerifyStack icons (bookmarks + crawlers)
+/favicon.jpg /favicon.ico?v=9 301
+/logo-192.jpg /logo-192.png?v=9 301
+
+# Canonical host: apex HTTPS (www + bare HTTP → https://verifystack.in)
+http://www.verifystack.in/* https://verifystack.in/:splat 301!
+https://www.verifystack.in/* https://verifystack.in/:splat 301!
+http://verifystack.in/* https://verifystack.in/:splat 301!
+
+# API gateway — must be before SPA fallback or /api/v1/* becomes index.html (200, no JSON body)
+/api/v1/*  https://verify.verifystack.in/api/v1/:splat  200
+
+# SPA
+/*    /index.html   200

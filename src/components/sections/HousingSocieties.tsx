@@ -7,13 +7,13 @@ import ScrollReveal from "@/components/ScrollReveal";
 const checks = [
   { label: "Domestic Help", icon: Users },
   { label: "Maintenance Staff", icon: Shield },
-  { label: "Tenants", icon: Home },
+  { label: "Tenant", icon: Home },
   { label: "Service Vendors", icon: CheckCircle },
 ];
 
 const HousingSocieties = () => {
   return (
-    <section className="py-24 relative overflow-hidden">
+    <section className="py-16 md:py-24 relative overflow-hidden">
       <div className="absolute inset-0">
         <div className="absolute bottom-20 left-[5%] w-64 h-64 bg-accent/5 rounded-full blur-3xl animate-float" />
       </div>
@@ -28,7 +28,7 @@ const HousingSocieties = () => {
                 Secure Your Community at Scale
               </h2>
               <p className="text-muted-foreground mb-6 leading-relaxed">
-                Streamline background checks for domestic help, maintenance staff, tenants, and service vendors across hundreds of households. Reduce administrative burden and create safer communities.
+                Run background checks for domestic help, maintenance staff, tenants and service vendors across your society — all from one dashboard.
               </p>
               <Link to="/contact">
                 <Button className="group btn-glow">

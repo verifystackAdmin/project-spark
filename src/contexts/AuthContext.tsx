@@ -2,10 +2,14 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { useNavigate, useLocation } from "react-router-dom";
 import { authApiClient as apiClient, getStoredTokens, storeTokens, clearTokens } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
+import { normalizeAppRole, type AppRole } from "@/lib/authRoles";
 
 interface User {
   name: string;
   email: string;
+  /** From JWT `role` (or first authority): `USER` | `TENANT_ADMIN` | `SALES` | `ADMIN` | `SUPER_ADMIN` */
+  role?: AppRole;
+  sub?: string;
   iat: number;
   exp: number;
 }
@@ -14,7 +18,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   user: User | null;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, redirectAfterLogin?: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
   googleAuth: (idToken: string) => Promise<void>;
   logout: () => void;
@@ -34,6 +38,25 @@ export const useAuth = () => {
   return context;
 };
 
+function readRoleFromPayload(payload: Record<string, unknown>): AppRole | undefined {
+  const direct = payload.role;
+  if (typeof direct === "string" && direct.trim()) {
+    return normalizeAppRole(direct);
+  }
+  const auth = payload.authorities ?? payload.authority;
+  if (Array.isArray(auth) && auth.length > 0) {
+    const first = auth[0];
+    if (typeof first === "string") {
+      return normalizeAppRole(first.replace(/^ROLE_/i, ""));
+    }
+    if (first && typeof first === "object" && "authority" in first) {
+      const a = (first as { authority?: unknown }).authority;
+      if (typeof a === "string") return normalizeAppRole(a.replace(/^ROLE_/i, ""));
+    }
+  }
+  return undefined;
+}
+
 const decodeToken = (token: string): User | null => {
   try {
     const base64Url = token.split(".")[1];
@@ -44,8 +67,21 @@ const decodeToken = (token: string): User | null => {
         .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
         .join("")
     );
-    const decoded = JSON.parse(jsonPayload) as User;
-    console.log("Decoded user from token:", decoded);
+    const raw = JSON.parse(jsonPayload) as Record<string, unknown>;
+    const base = raw as unknown as Partial<User>;
+    const sub = typeof raw.sub === "string" ? raw.sub : undefined;
+    const emailGuess =
+      (typeof raw.email === "string" && raw.email.trim()) ||
+      (sub && sub.includes("@") ? sub : "") ||
+      "";
+    const decoded: User = {
+      name: (typeof raw.name === "string" && raw.name.trim()) || "",
+      email: emailGuess,
+      role: readRoleFromPayload(raw) ?? normalizeAppRole(typeof base.role === "string" ? base.role : undefined),
+      sub,
+      iat: typeof raw.iat === "number" ? raw.iat : Number(raw.iat) || 0,
+      exp: typeof raw.exp === "number" ? raw.exp : Number(raw.exp) || 0,
+    };
     return decoded;
   } catch (error) {
     console.error("Failed to decode token:", error);
@@ -86,7 +122,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     checkAuth();
   }, []);
 
-  const handleAuthSuccess = (accessToken: string, refreshToken: string, message: string) => {
+  const handleAuthSuccess = (
+    accessToken: string,
+    refreshToken: string,
+    message: string,
+    redirectOverride?: string,
+  ) => {
     storeTokens(accessToken, refreshToken);
     const decodedUser = decodeToken(accessToken);
     setUser(decodedUser);
@@ -95,15 +136,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       title: "Success",
       description: message,
     });
-    navigate(getRedirectPath());
+    navigate(redirectOverride?.trim() || getRedirectPath());
   };
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string, redirectAfterLogin?: string) => {
     try {
       setIsLoading(true);
       const response = await apiClient.login({ email, password });
       if (response.success && response.data) {
-        handleAuthSuccess(response.data.accessToken, response.data.refreshToken, "Logged in successfully!");
+        handleAuthSuccess(
+          response.data.accessToken,
+          response.data.refreshToken,
+          "Logged in successfully!",
+          redirectAfterLogin,
+        );
       } else {
         toast({
           title: "Error",

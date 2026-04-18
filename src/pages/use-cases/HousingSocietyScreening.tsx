@@ -1,10 +1,7 @@
 import UseCasePageLayout from "@/components/UseCasePageLayout";
-import usePageMeta from "@/hooks/usePageMeta";
 import { Home } from "lucide-react";
 
-const HousingSocietyScreening = () => {
-  usePageMeta({ title: "Housing Society Screening – Bulk Staff & Tenant Verification", description: "Streamline background verification for housing societies: bulk staff screening, tenant pre-checks, vendor verification & society admin dashboard." });
-  return (
+const HousingSocietyScreening = () => (
   <UseCasePageLayout
     badge="Housing Society Security"
     title="Secure Your Community"
@@ -27,13 +24,12 @@ const HousingSocietyScreening = () => {
       { step: "3", title: "Ongoing Monitoring", description: "Continuous verification status tracking and alerts for the society." },
     ]}
     relatedPages={[
-      { label: "Domestic Worker Verification", href: "/use-cases/domestic-worker-verification" },
+      { label: "Domestic Worker Verification", href: "/solutions/domestic-worker-verification" },
       { label: "Tenant Screening", href: "/use-cases/tenant-screening" },
       { label: "Staffing Agency Verification", href: "/use-cases/staffing-agency-verification" },
       { label: "All Use Cases", href: "/use-cases" },
     ]}
   />
-  );
-};
+);
 
 export default HousingSocietyScreening;

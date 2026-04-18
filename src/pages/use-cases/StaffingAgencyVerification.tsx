@@ -1,10 +1,7 @@
 import UseCasePageLayout from "@/components/UseCasePageLayout";
-import usePageMeta from "@/hooks/usePageMeta";
 import { Users } from "lucide-react";
 
-const StaffingAgencyVerification = () => {
-  usePageMeta({ title: "Staffing Agency Verification – Pre-Verify Your Workforce", description: "Bulk candidate screening for staffing agencies: criminal checks, ID verification, trust badges, white-label reports & API integration." });
-  return (
+const StaffingAgencyVerification = () => (
   <UseCasePageLayout
     badge="Staffing Agency"
     title="Verify Your Workforce"
@@ -33,7 +30,6 @@ const StaffingAgencyVerification = () => {
       { label: "All Use Cases", href: "/use-cases" },
     ]}
   />
-  );
-};
+);
 
 export default StaffingAgencyVerification;

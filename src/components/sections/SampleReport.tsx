@@ -1,11 +1,12 @@
 import { motion } from "framer-motion";
 import { FileText, Download, Shield, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import ScrollReveal from "@/components/ScrollReveal";
 
 const SampleReport = () => {
   return (
-    <section className="py-24 relative overflow-hidden">
+    <section className="py-16 md:py-24 relative overflow-hidden">
       <div className="container mx-auto px-4 relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
           <ScrollReveal>
@@ -17,7 +18,7 @@ const SampleReport = () => {
                 AI Verification Report
               </h2>
               <p className="text-muted-foreground mb-6 leading-relaxed">
-                Every verification generates a comprehensive, legally admissible report with Trust Score, risk analysis, and actionable insights.
+                Every verification generates a detailed report with Trust Score, risk analysis and clear action signals.
               </p>
               <div className="space-y-4 mb-8">
                 {[
@@ -31,10 +32,12 @@ const SampleReport = () => {
                   </div>
                 ))}
               </div>
-              <Button variant="outline" className="group hover-lift">
-                <Download className="w-4 h-4 mr-2" />
-                Download Sample Report
-              </Button>
+              <Link to="/sample-report/view">
+                <Button variant="outline" className="group hover-lift">
+                  <Download className="w-4 h-4 mr-2" />
+                  View & Download Sample Report
+                </Button>
+              </Link>
             </div>
           </ScrollReveal>
 
@@ -55,13 +58,13 @@ const SampleReport = () => {
 
               <div className="space-y-4">
                 {[
-                  { label: "Subject", value: "████████ ████" },
-                  { label: "Trust Score", value: "87 / 100", highlight: true },
-                  { label: "Identity Match", value: "Confirmed ✓" },
-                  { label: "Criminal Check", value: "Clear ✓" },
-                  { label: "Address Verified", value: "Confirmed ✓" },
-                  { label: "Risk Level", value: "Low" },
-                  { label: "Fraud Probability", value: "2.3%" },
+                  { label: "Subject",           value: "Rahul K.",   highlight: false, redacted: true },
+                  { label: "Trust Score",        value: "87 / 100",  highlight: true,  redacted: false },
+                  { label: "Identity Match",     value: "Confirmed ✓", highlight: false, green: true },
+                  { label: "Criminal Check",     value: "Clear ✓",   highlight: false, green: true },
+                  { label: "Address Verified",   value: "Confirmed ✓", highlight: false, green: true },
+                  { label: "Risk Level",         value: "Low",       highlight: false, green: true },
+                  { label: "Fraud Probability",  value: "2.3%",      highlight: false, redacted: false },
                 ].map((row, i) => (
                   <motion.div
                     key={i}
@@ -72,7 +75,12 @@ const SampleReport = () => {
                     className="flex items-center justify-between py-2 border-b border-border/30 last:border-0"
                   >
                     <span className="text-xs text-muted-foreground font-mono uppercase tracking-wider">{row.label}</span>
-                    <span className={`text-sm font-medium ${row.highlight ? "gradient-text font-bold" : "text-foreground"}`}>
+                    <span className={`text-sm font-semibold ${
+                      row.highlight ? "gradient-text" :
+                      row.green    ? "text-green-400" :
+                      row.redacted ? "text-muted-foreground italic" :
+                      "text-foreground"
+                    }`}>
                       {row.value}
                     </span>
                   </motion.div>

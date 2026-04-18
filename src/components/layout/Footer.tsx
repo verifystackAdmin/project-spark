@@ -1,124 +1,178 @@
 import { Link } from "react-router-dom";
-import { Shield, Mail, MapPin, Linkedin, Twitter, Facebook, Instagram } from "lucide-react";
+import {
+  Mail,
+  MapPin,
+  Linkedin,
+  Twitter,
+  Facebook,
+  Instagram,
+  ChevronRight,
+  Shield,
+  Lock,
+} from "lucide-react";
 
 const Footer = () => {
-  const footerLinks = {
-    product: [
-      { label: "Use Cases", href: "/use-cases" },
-      { label: "Pricing", href: "/pricing" },
-      { label: "Run a Check", href: "/run-check" },
-      { label: "Dashboard", href: "/dashboard" },
-    ],
-    company: [
-      { label: "About Us", href: "/about" },
-      { label: "Careers", href: "/careers" },
-      { label: "Contact", href: "/contact" },
-      { label: "Blog", href: "/blog" },
-    ],
-    legal: [
-      { label: "Privacy Policy", href: "/privacy" },
-      { label: "Terms of Service", href: "/terms" },
-      { label: "Refund Policy", href: "/refund" },
-      { label: "Cookie Policy", href: "/cookies" },
-    ],
-    support: [
-      { label: "Help Center", href: "/help" },
-      { label: "API Documentation", href: "/api-docs" },
-      { label: "Status", href: "/status" },
-      { label: "FAQ", href: "/faq" },
-    ],
-  };
-
-  const complianceBadges = [
-    "GDPR Ready",
-    "India DPDP",
-    "AES-256",
-    "SOC 2",
+  const products = [
+    { label: "VerifyStack Shield",     href: "/product/verifystack-shield" },
+    { label: "VerifyStack RiskEngine", href: "/product/verifystack-riskengine" },
+    { label: "VerifyStack TrustScore", href: "/product/verifystack-trustscore" },
   ];
 
-  return (
-    <footer className="border-t border-border/50 bg-card/30">
-      <div className="container mx-auto px-4 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-12 mb-12">
-          {/* Brand Column */}
-          <div className="lg:col-span-2">
-            <Link to="/" className="flex items-center gap-2.5 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                <Shield className="w-4.5 h-4.5 text-primary-foreground" />
-              </div>
-              <span className="text-lg font-bold text-foreground tracking-tight">
-                VerifyStack
-              </span>
+  const solutions = [
+    { label: "Business Background Verification", href: "/solutions/business-background-verification" },
+    { label: "Tenant & Property Verification",   href: "/solutions/tenant-property-verification" },
+    { label: "Domestic Workforce Verification",  href: "/solutions/domestic-worker-verification" },
+    { label: "Individual Identity Verification", href: "/solutions/personal-identity-verification" },
+  ];
+
+  const resources = [
+    { label: "Blog",                  href: "/blog" },
+    { label: "Help Center",           href: "/help" },
+    { label: "API Documentation",     href: "/api-docs" },
+    { label: "Security & Compliance", href: "/security" },
+  ];
+
+  const aboutUs = [
+    { label: "Company Overview", href: "/about" },
+    { label: "Careers",          href: "/careers" },
+  ];
+
+  const legal = [
+    { label: "Privacy Policy",   href: "/privacy" },
+    { label: "Terms of Service", href: "/terms" },
+  ];
+
+  const socialLinks = [
+    { icon: Twitter,   href: "https://twitter.com/VerifyStack",              label: "Twitter" },
+    { icon: Linkedin,  href: "https://www.linkedin.com/company/verifystack", label: "LinkedIn" },
+    { icon: Facebook,  href: "https://www.facebook.com/VerifyStack",         label: "Facebook" },
+    { icon: Instagram, href: "https://www.instagram.com/VerifyStack",        label: "Instagram" },
+  ];
+
+  const badges = [
+    { label: "GDPR Ready" },
+    { label: "India DPDP" },
+    { label: "AES-256" },
+    { label: "SOC 2" },
+  ];
+
+  const FooterLinkList = ({
+    title,
+    links,
+  }: {
+    title: string;
+    links: { label: string; href: string }[];
+  }) => (
+    <div>
+      <h4 className="text-sm font-semibold text-foreground mb-4 tracking-tight">
+        {title}
+      </h4>
+      <ul className="space-y-2.5">
+        {links.map((link) => (
+          <li key={link.href}>
+            <Link
+              to={link.href}
+              className="group flex items-center gap-1.5 text-[13px] text-muted-foreground hover:text-primary transition-colors duration-150"
+            >
+              <ChevronRight className="w-3 h-3 flex-shrink-0 text-primary/40 group-hover:text-primary group-hover:translate-x-0.5 transition-all duration-150" />
+              {link.label}
             </Link>
-            <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-              Enterprise-grade background verification accessible to businesses, agencies, and everyday individuals.
-            </p>
-            <p className="text-xs text-muted-foreground font-mono uppercase tracking-widest mb-6">
-              Trust Infrastructure for India
-            </p>
-            <div className="flex items-center gap-3">
-              {[
-                { icon: Twitter, href: "#" },
-                { icon: Linkedin, href: "https://www.linkedin.com/company/verifystack" },
-                { icon: Facebook, href: "#" },
-                { icon: Instagram, href: "#" },
-              ].map((social, i) => (
-                <a key={i} href={social.href} target="_blank" rel="noopener noreferrer"
-                  className="w-8 h-8 rounded-lg bg-secondary/50 flex items-center justify-center hover:bg-primary/20 hover:text-primary transition-colors text-muted-foreground">
-                  <social.icon className="w-4 h-4" />
-                </a>
-              ))}
-            </div>
-          </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 
-          {Object.entries(footerLinks).map(([key, links]) => (
-            <div key={key}>
-              <h4 className="font-semibold text-foreground text-sm mb-4 capitalize">{key}</h4>
-              <ul className="space-y-2.5">
-                {links.map((link) => (
-                  <li key={link.label}>
-                    <Link to={link.href} className="text-xs text-muted-foreground hover:text-primary transition-colors">
-                      {link.label}
-                    </Link>
-                  </li>
+  return (
+    <footer className="border-t border-border/50 bg-card/20">
+      <div className="container mx-auto max-w-7xl px-4">
+
+        {/* ── Single main row: brand + all link columns ──────────────────── */}
+        <div className="py-12 md:py-14">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-x-8 gap-y-10">
+
+            {/* Brand — spans 2 cols on lg */}
+            <div className="col-span-2 lg:col-span-2">
+              <Link to="/" className="inline-flex mb-4">
+                <img
+                  src="/verifystack-logo.svg"
+                  alt="VerifyStack"
+                  className="h-10 w-auto object-contain max-w-[180px]"
+                />
+              </Link>
+              <p className="text-[13px] text-muted-foreground leading-relaxed mb-3 max-w-[220px]">
+                AI-powered background verification for businesses, landlords and individuals across India.
+              </p>
+              <p className="text-[11px] text-muted-foreground font-mono uppercase tracking-widest mb-4">
+                Trust Infrastructure for India
+              </p>
+              <div className="flex items-start gap-2 text-xs text-muted-foreground mb-4">
+                <MapPin className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-primary/60" />
+                <span>VerifyStack LLP, Pune, Maharashtra</span>
+              </div>
+              <div className="flex items-center gap-2">
+                {socialLinks.map((s) => (
+                  <a
+                    key={s.label}
+                    href={s.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={s.label}
+                    className="w-8 h-8 rounded-lg bg-secondary/60 flex items-center justify-center text-muted-foreground hover:bg-primary/20 hover:text-primary transition-colors"
+                  >
+                    <s.icon className="w-3.5 h-3.5" />
+                  </a>
                 ))}
-              </ul>
+              </div>
             </div>
-          ))}
-        </div>
 
-        {/* Compliance Badges */}
-        <div className="flex flex-wrap items-center justify-center gap-3 py-8 border-t border-border/50 mb-8">
-          {complianceBadges.map((badge, i) => (
-            <span key={i} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-secondary/50 text-xs text-muted-foreground font-mono border border-border/50">
-              <Shield className="w-3 h-3 text-trust" />
-              {badge}
-            </span>
-          ))}
-        </div>
+            {/* Link columns — 1 col each on lg */}
+            <FooterLinkList title="Products"  links={products} />
+            <FooterLinkList title="Solutions" links={solutions} />
+            <FooterLinkList title="Resources" links={resources} />
+            <FooterLinkList title="About Us"  links={aboutUs} />
+            <FooterLinkList title="Legal"     links={legal} />
 
-        {/* Contact */}
-        <div className="flex flex-wrap items-center justify-center gap-6 pb-8 border-b border-border/50 mb-8">
-          <a href="mailto:support@verifystack.in" className="flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors">
-            <Mail className="w-3.5 h-3.5" />
-            support@verifystack.in
-          </a>
-          <span className="flex items-center gap-2 text-xs text-muted-foreground">
-            <MapPin className="w-3.5 h-3.5" />
-            Pune, India
-          </span>
-        </div>
-
-        {/* Bottom Bar */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} VerifyStack. All rights reserved.
-          </p>
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">Secured by</span>
-            <span className="text-xs font-semibold text-accent font-mono">256-bit SSL</span>
           </div>
         </div>
+
+        {/* ── Compliance Badges ──────────────────────────────────────────── */}
+        <div className="border-t border-border/30 py-5">
+          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+            {badges.map((b) => (
+              <span
+                key={b.label}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-secondary/40 border border-border/60 text-xs text-muted-foreground font-mono"
+              >
+                <Shield className="w-3 h-3 text-primary/70" />
+                {b.label}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Bottom Bar ─────────────────────────────────────────────────── */}
+        <div className="border-t border-border/30 py-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+            <p className="text-xs text-muted-foreground">
+              © 2026 VerifyStack. All rights reserved.
+            </p>
+            <a
+              href="mailto:support@verifystack.in"
+              className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors"
+            >
+              <Mail className="w-3.5 h-3.5" />
+              support@verifystack.in
+            </a>
+            <div className="flex items-center gap-1.5">
+              <Lock className="w-3 h-3 text-primary/70" />
+              <span className="text-xs text-muted-foreground">
+                Secured by <span className="font-semibold text-foreground">256-bit SSL</span>
+              </span>
+            </div>
+          </div>
+        </div>
+
       </div>
     </footer>
   );

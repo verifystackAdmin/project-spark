@@ -1,104 +1,137 @@
-import { useState } from "react";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useMemo, useEffect, useRef } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { FileText, Search, Filter, Download, Eye, Calendar } from "lucide-react";
-import { Link } from "react-router-dom";
+import { FileText, Search, Filter, Download, Eye, Calendar, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useBgvReports } from "@/hooks/useBgvReports";
+import { useToast } from "@/hooks/use-toast";
+import {
+  bgvReportRowStatus,
+  overallStatusToScore,
+  bgvReportDownloadHref,
+  bgvReportHtmlViewHref,
+} from "@/lib/bgvGatewayApi";
 
-// Mock data for reports
-const mockReports = [
-  {
-    id: "RPT-2024-001",
-    subjectName: "Rahul Sharma",
-    verificationType: "Employment",
-    status: "completed",
-    trustScore: 92,
-    createdAt: "2024-01-15T10:30:00",
-    completedAt: "2024-01-15T14:45:00",
-  },
-  {
-    id: "RPT-2024-002",
-    subjectName: "Priya Patel",
-    verificationType: "Identity",
-    status: "completed",
-    trustScore: 88,
-    createdAt: "2024-01-14T09:00:00",
-    completedAt: "2024-01-14T11:30:00",
-  },
-  {
-    id: "RPT-2024-003",
-    subjectName: "Amit Kumar",
-    verificationType: "Education",
-    status: "in_progress",
-    trustScore: null,
-    createdAt: "2024-01-16T08:15:00",
-    completedAt: null,
-  },
-  {
-    id: "RPT-2024-004",
-    subjectName: "Sneha Reddy",
-    verificationType: "Criminal",
-    status: "completed",
-    trustScore: 95,
-    createdAt: "2024-01-13T14:20:00",
-    completedAt: "2024-01-13T18:00:00",
-  },
-  {
-    id: "RPT-2024-005",
-    subjectName: "Vikram Singh",
-    verificationType: "Address",
-    status: "failed",
-    trustScore: null,
-    createdAt: "2024-01-12T11:00:00",
-    completedAt: "2024-01-12T11:45:00",
-  },
-  {
-    id: "RPT-2024-006",
-    subjectName: "Ananya Desai",
-    verificationType: "Employment",
-    status: "completed",
-    trustScore: 78,
-    createdAt: "2024-01-11T16:30:00",
-    completedAt: "2024-01-11T20:15:00",
-  },
-  {
-    id: "RPT-2024-007",
-    subjectName: "Karthik Nair",
-    verificationType: "Identity",
-    status: "pending",
-    trustScore: null,
-    createdAt: "2024-01-16T12:00:00",
-    completedAt: null,
-  },
-  {
-    id: "RPT-2024-008",
-    subjectName: "Meera Iyer",
-    verificationType: "Education",
-    status: "completed",
-    trustScore: 85,
-    createdAt: "2024-01-10T09:45:00",
-    completedAt: "2024-01-10T13:30:00",
-  },
-];
+type SortByTime = "newest" | "oldest";
+
+type ReportsLocationState = {
+  bgvSubmitted?: boolean;
+  reportId?: string;
+};
+
+const REPORTS_PAGE_SIZE = 10;
 
 const Reports = () => {
+  const { user } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const bgvToastShown = useRef(false);
+  const [page, setPage] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [filterReportId, setFilterReportId] = useState("");
+  const [debouncedReportId, setDebouncedReportId] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [sortByTime, setSortByTime] = useState<SortByTime>("newest");
 
-  const filteredReports = mockReports.filter((report) => {
-    const matchesSearch =
-      report.subjectName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      report.id.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === "all" || report.status === statusFilter;
-    const matchesType = typeFilter === "all" || report.verificationType === typeFilter;
-    return matchesSearch && matchesStatus && matchesType;
+  useEffect(() => {
+    const t = window.setTimeout(() => setDebouncedSearch(searchQuery.trim()), 400);
+    return () => window.clearTimeout(t);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    const t = window.setTimeout(() => setDebouncedReportId(filterReportId.trim()), 400);
+    return () => window.clearTimeout(t);
+  }, [filterReportId]);
+
+  const sortDir = sortByTime === "newest" ? "desc" : "asc";
+  const statusParam = statusFilter !== "all" ? statusFilter : undefined;
+
+  const { reports, totalElements, totalPages, loading, error, refetch } = useBgvReports(user?.email, {
+    page,
+    pageSize: REPORTS_PAGE_SIZE,
+    sortDir,
+    q: debouncedSearch || undefined,
+    status: statusParam,
+    reportId: debouncedReportId || undefined,
+    startDate: dateFrom.trim() || undefined,
+    endDate: dateTo.trim() || undefined,
   });
+
+  useEffect(() => {
+    setPage(0);
+  }, [debouncedSearch, debouncedReportId, dateFrom, dateTo, statusFilter, sortByTime]);
+
+  useEffect(() => {
+    const st = location.state as ReportsLocationState | null;
+    if (!st?.bgvSubmitted || !st?.reportId) {
+      bgvToastShown.current = false;
+      return;
+    }
+    if (bgvToastShown.current) return;
+    bgvToastShown.current = true;
+    setPage(0);
+    setStatusFilter("pending");
+    void refetch({ silent: true });
+    toast({
+      title: "BGV report submitted",
+      description: (
+        <span className="block pt-1">
+          <span className="text-muted-foreground">Report ID</span>{" "}
+          <code className="rounded bg-muted px-1.5 py-0.5 text-xs font-mono">{st.reportId}</code>
+        </span>
+      ),
+    });
+    navigate(location.pathname, { replace: true, state: {} });
+  }, [location.pathname, location.state, navigate, refetch, toast]);
+
+  const hasIncomplete = useMemo(
+    () =>
+      reports.some((r) => {
+        const s = bgvReportRowStatus(r);
+        return s === "pending" || s === "in_progress";
+      }),
+    [reports],
+  );
+
+  useEffect(() => {
+    if (!user?.email?.trim()) return;
+    const ms = hasIncomplete ? 4000 : 30_000;
+    const id = window.setInterval(() => {
+      void refetch({ silent: true });
+    }, ms);
+    return () => window.clearInterval(id);
+  }, [user?.email, refetch, hasIncomplete]);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [page]);
+
+  const rows = useMemo(() => {
+    return reports.map((r) => {
+      const id = r.reportId ?? "";
+      return {
+        id,
+        subjectName: r.subjectFullName ?? "—",
+        verificationType: "BGV",
+        status: bgvReportRowStatus(r),
+        trustScore: overallStatusToScore(r.overallStatus),
+        createdAt: r.generatedAt ?? null,
+        overallStatus: r.overallStatus,
+        apiStatus: r.status,
+      };
+    });
+  }, [reports]);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -124,199 +157,451 @@ const Reports = () => {
 
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "—";
-    return new Date(dateString).toLocaleDateString("en-IN", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <Header />
-      <main className="flex-grow container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-3">
-              <FileText className="h-8 w-8 text-primary" />
-              <div>
-                <h1 className="text-3xl font-bold text-foreground">Verification Reports</h1>
-                <p className="text-muted-foreground">View and manage all your verification reports</p>
-              </div>
+    <DashboardLayout
+      title="Verification Reports"
+      contentClassName="min-w-0 w-full max-w-6xl mx-auto px-3 py-4 sm:px-6 sm:py-6"
+      showFooter={false}
+      headerLeadingLayout="beside-title"
+      headerLeading={
+        <div className="relative w-full min-w-0 md:max-w-md md:flex-1">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
+          <Input
+            id="reports-search"
+            placeholder="Search by name or report ID..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9"
+            aria-label="Search reports by subject name or report ID"
+          />
+        </div>
+      }
+      headerTrailing={
+        <>
+          <Button variant="outline" size="sm" className="shrink-0" onClick={() => void refetch()} disabled={loading}>
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Refresh"}
+          </Button>
+          <Button asChild size="sm" className="min-w-0 shrink-0">
+            <Link to="/run-check" className="inline-flex max-w-full items-center">
+              <FileText className="mr-1.5 h-4 w-4 shrink-0 sm:mr-2" />
+              <span className="truncate sm:whitespace-normal">New Verification</span>
+            </Link>
+          </Button>
+        </>
+      }
+    >
+      <p className="mb-4 text-sm text-foreground/80">
+        Your verification reports appear here as they complete.
+      </p>
+
+      {error && (
+        <p className="mb-4 text-sm text-destructive">
+          {error} — check your connection and try refreshing. If the problem continues, contact support.
+        </p>
+      )}
+
+      <section className="mb-4 grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4" aria-label="Report statistics summary">
+        <Card className="shadow-sm">
+          <CardContent className="p-3 sm:p-4 sm:pt-5">
+            <div className="text-xl font-bold tabular-nums text-foreground sm:text-2xl">
+              {loading ? "…" : totalElements}
             </div>
-            <Button asChild>
-              <Link to="/run-check">
-                <FileText className="mr-2 h-4 w-4" />
-                New Verification
-              </Link>
-            </Button>
+            <p className="text-xs text-muted-foreground sm:text-sm">Total reports</p>
+          </CardContent>
+        </Card>
+        <Card className="shadow-sm">
+          <CardContent className="p-3 sm:p-4 sm:pt-5">
+            <div className="text-xl font-bold tabular-nums text-green-600 sm:text-2xl">
+              {loading ? "…" : rows.filter((r) => r.status === "completed").length}
+            </div>
+            <p className="text-xs text-muted-foreground sm:text-sm">Completed (this page)</p>
+          </CardContent>
+        </Card>
+        <Card className="shadow-sm">
+          <CardContent className="p-3 sm:p-4 sm:pt-5">
+            <div className="text-xl font-bold tabular-nums text-blue-600 sm:text-2xl">
+              {loading
+                ? "…"
+                : rows.filter((r) => r.status === "in_progress" || r.status === "pending").length}
+            </div>
+            <p className="text-xs text-muted-foreground sm:text-sm">In progress (this page)</p>
+          </CardContent>
+        </Card>
+        <Card className="shadow-sm">
+          <CardContent className="p-3 sm:p-4 sm:pt-5">
+            <div className="text-xl font-bold tabular-nums text-primary sm:text-2xl">
+              {loading
+                ? "…"
+                : (() => {
+                    const withScore = rows.filter((r) => r.trustScore != null);
+                    if (withScore.length === 0) return "—";
+                    return (
+                      Math.round(
+                        withScore.reduce((a, r) => a + (r.trustScore || 0), 0) / withScore.length,
+                      ) + "%"
+                    );
+                  })()}
+            </div>
+            <p className="text-xs text-muted-foreground sm:text-sm">Avg trust (this page)</p>
+          </CardContent>
+        </Card>
+      </section>
+
+      <section
+        className="mb-4 rounded-xl border border-border/60 bg-card/40 px-3 py-2.5 sm:px-4 sm:py-3"
+        aria-label="Filter and sort reports"
+      >
+        <div className="flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:items-end sm:gap-x-4 sm:gap-y-2">
+          <div className="flex min-w-0 flex-1 items-center gap-2 sm:items-end">
+            <Filter className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+            <div className="min-w-0">
+              <p className="text-sm font-semibold leading-tight text-foreground">Filters</p>
+              <p className="sr-only">
+                Filter by report ID, generated date range, status, and sort order. Use the header search for name or
+                ID.
+              </p>
+            </div>
           </div>
-
-          {/* Stats Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-2xl font-bold text-foreground">{mockReports.length}</div>
-                <p className="text-sm text-muted-foreground">Total Reports</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-2xl font-bold text-green-600">
-                  {mockReports.filter((r) => r.status === "completed").length}
-                </div>
-                <p className="text-sm text-muted-foreground">Completed</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-2xl font-bold text-blue-600">
-                  {mockReports.filter((r) => r.status === "in_progress" || r.status === "pending").length}
-                </div>
-                <p className="text-sm text-muted-foreground">In Progress</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-2xl font-bold text-primary">
-                  {mockReports.filter((r) => r.trustScore !== null).length > 0
-                    ? Math.round(
-                        mockReports
-                          .filter((r) => r.trustScore !== null)
-                          .reduce((acc, r) => acc + (r.trustScore || 0), 0) /
-                          mockReports.filter((r) => r.trustScore !== null).length
-                      )
-                    : 0}
-                  %
-                </div>
-                <p className="text-sm text-muted-foreground">Avg Trust Score</p>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Filters */}
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Filter className="h-5 w-5" />
-                Filters
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search by name or report ID..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-9"
-                  />
-                </div>
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-full sm:w-[180px]">
-                    <SelectValue placeholder="Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Statuses</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                    <SelectItem value="in_progress">In Progress</SelectItem>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="failed">Failed</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Select value={typeFilter} onValueChange={setTypeFilter}>
-                  <SelectTrigger className="w-full sm:w-[180px]">
-                    <SelectValue placeholder="Type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Types</SelectItem>
-                    <SelectItem value="Identity">Identity</SelectItem>
-                    <SelectItem value="Employment">Employment</SelectItem>
-                    <SelectItem value="Education">Education</SelectItem>
-                    <SelectItem value="Criminal">Criminal</SelectItem>
-                    <SelectItem value="Address">Address</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Reports Table */}
-          <Card>
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Report ID</TableHead>
-                    <TableHead>Subject Name</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Trust Score</TableHead>
-                    <TableHead>
-                      <div className="flex items-center gap-1">
-                        <Calendar className="h-4 w-4" />
-                        Date
-                      </div>
-                    </TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredReports.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                        No reports found matching your criteria
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    filteredReports.map((report) => (
-                      <TableRow key={report.id}>
-                        <TableCell className="font-mono text-sm">{report.id}</TableCell>
-                        <TableCell className="font-medium">{report.subjectName}</TableCell>
-                        <TableCell>
-                          <Badge variant="outline">{report.verificationType}</Badge>
-                        </TableCell>
-                        <TableCell>{getStatusBadge(report.status)}</TableCell>
-                        <TableCell>
-                          <span className={`font-semibold ${getTrustScoreColor(report.trustScore)}`}>
-                            {report.trustScore !== null ? `${report.trustScore}%` : "—"}
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-muted-foreground">
-                          {formatDate(report.createdAt)}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            <Button variant="ghost" size="sm" asChild>
-                              <Link to="/report">
-                                <Eye className="h-4 w-4" />
-                              </Link>
-                            </Button>
-                            {report.status === "completed" && (
-                              <Button variant="ghost" size="sm">
-                                <Download className="h-4 w-4" />
-                              </Button>
-                            )}
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-
-          {/* Pagination hint */}
-          <div className="mt-4 text-center text-sm text-muted-foreground">
-            Showing {filteredReports.length} of {mockReports.length} reports
+          <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+            <div className="min-w-0 space-y-1 sm:min-w-[140px]">
+              <Label htmlFor="reports-status-filter" className="text-xs font-medium text-foreground/90">
+                Status
+              </Label>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger id="reports-status-filter" className="h-10 w-full" aria-label="Filter by report status">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All statuses</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="in_progress">In progress</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="failed">Failed</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="min-w-0 space-y-1 sm:min-w-[160px]">
+              <Label htmlFor="reports-sort-time" className="text-xs font-medium text-foreground/90">
+                Sort by date
+              </Label>
+              <Select value={sortByTime} onValueChange={(v) => setSortByTime(v as SortByTime)}>
+                <SelectTrigger id="reports-sort-time" className="h-10 w-full" aria-label="Sort reports by date">
+                  <SelectValue placeholder="Sort" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="newest">Newest first</SelectItem>
+                  <SelectItem value="oldest">Oldest first</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="min-w-0 space-y-1 xl:col-span-1">
+              <Label htmlFor="reports-filter-report-id" className="text-xs font-medium text-foreground/90">
+                Report ID <span className="font-normal text-muted-foreground">(optional)</span>
+              </Label>
+              <Input
+                id="reports-filter-report-id"
+                className="h-10 font-mono text-sm"
+                placeholder="Filter by report ID (optional)"
+                value={filterReportId}
+                onChange={(e) => setFilterReportId(e.target.value)}
+                autoComplete="off"
+                aria-label="Filter by report ID"
+              />
+            </div>
+            <div className="min-w-0 space-y-1">
+              <Label htmlFor="reports-date-from" className="text-xs font-medium text-foreground/90">
+                From date
+              </Label>
+              <Input
+                id="reports-date-from"
+                type="date"
+                className="h-10"
+                value={dateFrom}
+                onChange={(e) => setDateFrom(e.target.value)}
+                aria-label="Include reports generated on or after this date"
+              />
+            </div>
+            <div className="min-w-0 space-y-1">
+              <Label htmlFor="reports-date-to" className="text-xs font-medium text-foreground/90">
+                To date
+              </Label>
+              <Input
+                id="reports-date-to"
+                type="date"
+                className="h-10"
+                value={dateTo}
+                onChange={(e) => setDateTo(e.target.value)}
+                aria-label="Include reports generated on or before this date"
+              />
+            </div>
           </div>
         </div>
-      </main>
-      <Footer />
-    </div>
+      </section>
+
+      <p className="mb-2 text-xs text-muted-foreground sm:hidden">
+        Search by name or report ID using the search field in the header above.
+      </p>
+
+      {/* Mobile: card list */}
+      <div className="md:hidden">
+        {loading ? (
+          <Card>
+            <CardContent className="flex items-center justify-center gap-2 py-10 text-sm text-muted-foreground">
+              <Loader2 className="h-5 w-5 animate-spin shrink-0" aria-hidden />
+              <span>Loading reports…</span>
+            </CardContent>
+          </Card>
+        ) : rows.length === 0 ? (
+          <Card>
+            <CardContent className="py-10 text-center text-sm text-muted-foreground">
+              No reports match your filters.{" "}
+              <Link to="/run-check" className="font-medium text-primary hover:underline">
+                Run a check
+              </Link>
+            </CardContent>
+          </Card>
+        ) : (
+          <ul className="list-none space-y-3 p-0" role="list" aria-label="Verification reports">
+            {rows.map((report) => (
+              <li key={report.id || `${report.subjectName}-${report.createdAt ?? "na"}`}>
+                <Card className="overflow-hidden border-border/60">
+                  <CardContent className="space-y-3 p-4">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                          Subject
+                        </p>
+                        <p className="truncate font-semibold text-foreground">{report.subjectName}</p>
+                        <p className="mt-1 font-mono text-xs text-muted-foreground">
+                          ID: {report.id || "—"}
+                        </p>
+                      </div>
+                      {getStatusBadge(report.status)}
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      <div>
+                        <p className="text-xs text-muted-foreground">Trust score</p>
+                        <p className={`font-semibold tabular-nums ${getTrustScoreColor(report.trustScore)}`}>
+                          {report.trustScore !== null ? `${report.trustScore}%` : "—"}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">Date</p>
+                        <p className="flex items-center gap-1 font-medium text-foreground">
+                          <Calendar className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden />
+                          {formatDate(report.createdAt)}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      <Badge variant="outline" className="mb-1 mr-1">
+                        {report.verificationType}
+                      </Badge>
+                      <span className="font-mono">
+                        {report.apiStatus ?? "—"}
+                        {report.overallStatus ? ` · ${report.overallStatus}` : ""}
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-2 border-t border-border/50 pt-3">
+                      {report.id ? (
+                        <Button variant="secondary" size="sm" className="flex-1 sm:flex-none" asChild>
+                          <a
+                            href={bgvReportHtmlViewHref(report.id)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="Open verification report in a new tab"
+                          >
+                            <Eye className="mr-2 h-4 w-4" aria-hidden />
+                            View report
+                          </a>
+                        </Button>
+                      ) : (
+                        <Button variant="secondary" size="sm" className="flex-1 sm:flex-none" disabled>
+                          <Eye className="mr-2 h-4 w-4" aria-hidden />
+                          View report
+                        </Button>
+                      )}
+                      {report.id && report.status === "completed" ? (
+                        <Button variant="outline" size="sm" className="flex-1 sm:flex-none" asChild>
+                          <a
+                            href={bgvReportDownloadHref(report.id)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <Download className="mr-2 h-4 w-4" aria-hidden />
+                            Download
+                          </a>
+                        </Button>
+                      ) : null}
+                    </div>
+                  </CardContent>
+                </Card>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      {/* Tablet/desktop: table */}
+      <Card className="hidden md:block">
+        <CardContent className="p-0">
+          <Table>
+            <caption className="sr-only">
+              Verification reports table. Columns: report ID, subject, type, status, trust score, date, and
+              actions.
+            </caption>
+            <TableHeader>
+              <TableRow>
+                <TableHead scope="col">Report ID</TableHead>
+                <TableHead scope="col">Subject name</TableHead>
+                <TableHead scope="col">Type</TableHead>
+                <TableHead scope="col">API / overall</TableHead>
+                <TableHead scope="col">Trust score</TableHead>
+                <TableHead scope="col">
+                  <span className="flex items-center gap-1">
+                    <Calendar className="h-4 w-4 shrink-0" aria-hidden />
+                    Date
+                  </span>
+                </TableHead>
+                <TableHead scope="col" className="text-right">
+                  Actions
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="py-8 text-center text-muted-foreground">
+                    <Loader2 className="mr-2 inline h-6 w-6 animate-spin" aria-hidden />
+                    Loading reports…
+                  </TableCell>
+                </TableRow>
+              ) : rows.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="py-8 text-center text-muted-foreground">
+                    No reports found.{" "}
+                    <Link to="/run-check" className="text-primary hover:underline">
+                      Run a check
+                    </Link>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                rows.map((report) => (
+                  <TableRow key={report.id || `${report.subjectName}-${report.createdAt ?? "na"}`}>
+                    <TableCell className="max-w-[140px] truncate font-mono text-sm">
+                      {report.id || "—"}
+                    </TableCell>
+                    <TableCell className="font-medium">{report.subjectName}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline">{report.verificationType}</Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-col gap-1">
+                        {getStatusBadge(report.status)}
+                        <span className="font-mono text-xs text-muted-foreground">
+                          {report.apiStatus ?? "—"}
+                          {report.overallStatus ? ` · ${report.overallStatus}` : ""}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <span className={`font-semibold tabular-nums ${getTrustScoreColor(report.trustScore)}`}>
+                        {report.trustScore !== null ? `${report.trustScore}%` : "—"}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">{formatDate(report.createdAt)}</TableCell>
+                    <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          {report.id ? (
+                            <Button variant="ghost" size="sm" asChild aria-label="Open verification report in new tab">
+                              <a
+                                href={bgvReportHtmlViewHref(report.id)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                <Eye className="h-4 w-4" />
+                              </a>
+                            </Button>
+                          ) : (
+                            <Button variant="ghost" size="sm" disabled aria-label="Report ID not available">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          )}
+                        {report.id && report.status === "completed" ? (
+                          <Button variant="ghost" size="sm" asChild aria-label="Download report PDF">
+                            <a
+                              href={bgvReportDownloadHref(report.id)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <Download className="h-4 w-4" />
+                            </a>
+                          </Button>
+                        ) : null}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      <div
+        className="mt-6 flex flex-col items-stretch gap-4 border-t border-border/60 pt-4 sm:flex-row sm:items-center sm:justify-between"
+        role="navigation"
+        aria-label="Reports pagination"
+      >
+        <p className="text-center text-sm text-muted-foreground sm:text-left" role="status" aria-live="polite">
+          {totalElements === 0 ? (
+            <>No reports yet.</>
+          ) : (
+            <>
+              Showing{" "}
+              <span className="font-medium tabular-nums text-foreground">
+                {page * REPORTS_PAGE_SIZE + 1}–{Math.min((page + 1) * REPORTS_PAGE_SIZE, totalElements)}
+              </span>{" "}
+              of <span className="font-medium tabular-nums text-foreground">{totalElements}</span> reports
+            </>
+          )}
+        </p>
+        <div className="flex items-center justify-center gap-2 sm:justify-end">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={loading || page <= 0}
+            onClick={() => setPage((p) => Math.max(0, p - 1))}
+            aria-label="Previous page"
+          >
+            <ChevronLeft className="h-4 w-4" aria-hidden />
+            Previous
+          </Button>
+          <span className="min-w-[7rem] text-center text-sm tabular-nums text-muted-foreground">
+            Page {totalElements === 0 ? 0 : page + 1} of {totalElements === 0 ? 0 : totalPages}
+          </span>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={loading || page >= totalPages - 1 || totalElements === 0}
+            onClick={() => setPage((p) => p + 1)}
+            aria-label="Next page"
+          >
+            Next
+            <ChevronRight className="h-4 w-4" aria-hidden />
+          </Button>
+        </div>
+      </div>
+    </DashboardLayout>
   );
 };
 
