@@ -69,7 +69,7 @@ const TABS = [
       { label: "Overall Trust Index", score: 82, status: "pass", tooltip: "AI-aggregated Trust Score across all data points." },
     ],
   },
-];
+] as const;
 
 // ── Main Component ─────────────────────────────────────────────────────────
 const AIDashboardPreview = () => {
