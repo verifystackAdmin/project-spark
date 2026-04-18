@@ -2,6 +2,8 @@ import { Link } from "react-router-dom";
 import {
   Mail,
   MapPin,
+  Phone,
+  Clock,
   Linkedin,
   Twitter,
   Facebook,
@@ -10,6 +12,7 @@ import {
   Shield,
   Lock,
 } from "lucide-react";
+import { siteIndia } from "@/lib/siteIdentity";
 
 const Footer = () => {
   const products = [
@@ -106,9 +109,24 @@ const Footer = () => {
               <p className="text-[11px] text-muted-foreground font-mono uppercase tracking-widest mb-4">
                 Trust Infrastructure for India
               </p>
-              <div className="flex items-start gap-2 text-xs text-muted-foreground mb-4">
-                <MapPin className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-primary/60" />
-                <span>VerifyStack LLP, Pune, Maharashtra</span>
+              <div className="space-y-2 mb-4">
+                <div className="flex items-start gap-2 text-xs text-muted-foreground">
+                  <MapPin className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-primary/60" />
+                  <span>VerifyStack LLP · Pune, Maharashtra 411001</span>
+                </div>
+                <div className="flex items-start gap-2 text-xs text-muted-foreground">
+                  <Phone className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-primary/60" />
+                  <a href="tel:+912067448900" className="hover:text-primary transition-colors">
+                    +91 20 6744 8900
+                  </a>
+                </div>
+                <div className="flex items-start gap-2 text-xs text-muted-foreground">
+                  <Clock className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-primary/60" />
+                  <span>Mon–Sat · 9:00–19:00 IST</span>
+                </div>
+                <p className="text-[11px] text-muted-foreground/80 italic pt-1" lang="hi">
+                  {siteIndia.trustLineHi}
+                </p>
               </div>
               <div className="flex items-center gap-2">
                 {socialLinks.map((s) => (
