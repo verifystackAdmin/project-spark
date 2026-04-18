@@ -20,8 +20,10 @@ import LandingPricing from "@/components/sections/LandingPricing";
 import TrustStack from "@/components/sections/TrustStack";
 import HomeFAQ from "@/components/sections/HomeFAQ";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Shield, Sparkles, ArrowRight, Lock, ShieldCheck } from "lucide-react";
+import { Shield, Sparkles, ArrowRight, Lock, ShieldCheck, MapPin } from "lucide-react";
 import AIScanAnimation from "@/components/AIScanAnimation";
+import { siteIndia } from "@/lib/siteIdentity";
+import heroIndia from "@/assets/hero-verification-india.jpg";
 
 const Index = () => {
   const isMobile = useIsMobile();
@@ -112,6 +114,7 @@ const Index = () => {
                   { icon: ShieldCheck, text: "DPDP 2023 Compliant" },
                   { icon: Lock, text: "AES-256 Encryption" },
                   { icon: Shield, text: "SOC 2 Ready" },
+                  { icon: MapPin, text: "Built in Pune · IST" },
                 ].map(({ icon: Icon, text }) => (
                   <span
                     key={text}
@@ -122,16 +125,43 @@ const Index = () => {
                   </span>
                 ))}
               </motion.div>
+
+              {/* Hindi trust line — subtle India anchor */}
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.8, delay: 0.85 }}
+                className="mt-3 text-xs text-foreground/45 italic text-center md:text-left"
+                lang="hi"
+              >
+                {siteIndia.trustLineHi}
+              </motion.p>
             </div>
 
-            {/* Right — AI Scan Animation */}
+            {/* Right — Real product imagery + scan overlay */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.3 }}
               className="hidden md:flex w-full items-start justify-center lg:justify-end"
             >
-              <AIScanAnimation />
+              <div className="relative w-full max-w-[560px] aspect-[4/3] rounded-2xl overflow-hidden border border-border/40 shadow-2xl shadow-primary/10">
+                <img
+                  src={heroIndia}
+                  alt="Indian product manager reviewing a VerifyStack background verification dashboard"
+                  width={1536}
+                  height={1024}
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+                {/* Frosted edge tint to blend with hero */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-background/60 via-transparent to-primary/10" />
+                {/* Floating scan animation overlay (kept for AI feel) */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="opacity-90">
+                    <AIScanAnimation />
+                  </div>
+                </div>
+              </div>
             </motion.div>
           </div>
         </div>
