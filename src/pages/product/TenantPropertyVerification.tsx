@@ -107,7 +107,6 @@ const TenantPropertyVerification = () => (
     {/* Hero */}
     <section className="relative pt-32 pb-20 overflow-hidden border-b border-border/30">
       <SolutionHeroBackground routePath="/solutions/tenant-property-verification" />
-      />
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-3xl mx-auto text-center">
           <motion.div

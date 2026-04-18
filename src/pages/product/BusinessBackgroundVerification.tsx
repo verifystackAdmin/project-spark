@@ -212,7 +212,6 @@ const BusinessBackgroundVerification = () => {
       {/* ── HERO ── */}
       <section className="relative border-b border-border/30 pt-32 pb-24 overflow-hidden">
         <SolutionHeroBackground routePath="/solutions/business-background-verification" />
-        />
 
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-3xl mx-auto text-center">
