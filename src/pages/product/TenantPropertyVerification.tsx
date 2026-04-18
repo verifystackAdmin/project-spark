@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import HeroBackground from "@/components/layout/HeroBackground";
+import SolutionHeroBackground from "@/components/layout/SolutionHeroBackground";
 import ScrollReveal from "@/components/ScrollReveal";
 import {
   ArrowRight, Home, Shield, CheckCircle,
@@ -105,9 +106,7 @@ const TenantPropertyVerification = () => (
 
     {/* Hero */}
     <section className="relative pt-32 pb-20 overflow-hidden border-b border-border/30">
-      <HeroBackground
-        imageUrl="https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
-        altText="Modern apartment interior"
+      <SolutionHeroBackground routePath="/solutions/tenant-property-verification" />
       />
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-3xl mx-auto text-center">

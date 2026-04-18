@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import HeroBackground from "@/components/layout/HeroBackground";
+import SolutionHeroBackground from "@/components/layout/SolutionHeroBackground";
 import ScrollReveal from "@/components/ScrollReveal";
 import {
   ArrowRight, Building, Shield, Lock, BadgeCheck,
@@ -210,9 +211,7 @@ const BusinessBackgroundVerification = () => {
 
       {/* ── HERO ── */}
       <section className="relative border-b border-border/30 pt-32 pb-24 overflow-hidden">
-        <HeroBackground
-          imageUrl="https://images.pexels.com/photos/8199708/pexels-photo-8199708.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
-          altText="Business team collaborating"
+        <SolutionHeroBackground routePath="/solutions/business-background-verification" />
         />
 
         <div className="container mx-auto px-4 relative z-10">
